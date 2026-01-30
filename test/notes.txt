@@ -1,0 +1,21 @@
+Step1: 
+    URLS: 
+
+    https://code.visualstudio.com/api/get-started/your-first-extension (cmd to setup workspace and install dependencies)
+
+    npm install --global yo generator-code
+
+    npx yo code -> asks several questions ( extension name , description, identifier(username), Programming lang, git initialize..)
+
+
+Step 2:  Check current VS Code version ( Help > About )
+    And In package.json , check "engines" value.  
+    ****Note****: engines <= VS Code verion ( else extension not enable & cant install)
+
+Step 3: Running extension
+    extension.js ( main file) - press Fn+F5 / F5 ( VS Code's Window "Extension Development Host" opens)
+        Can apply breakpoint in extension.js, when doing action debug applys. 
+
+    Go to Command Pallete (Ctrl+Shift+P), Commands - can see our extension command ( "Hello World" )
+
+--------------------------------------------------------------------------------------------------------------

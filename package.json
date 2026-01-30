@@ -1,0 +1,60 @@
+{
+  "name": "helloWorld",
+  "displayName": "Hello ",
+  "description": "",
+  "version": "0.0.1",
+  "publisher": "yuvaraj",
+  "engines": {
+    "vscode": "^1.100.1"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:x"
+  ],
+  "main": "extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "run.ExecutionScripts",
+        "title": "Run via executionScripts.sh"
+      },
+      {
+        "command": "copyRelativePath.Workspace",
+        "title": "Copy Relative Path (Workspace)"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "copyRelativePath.Workspace",
+          "group": "6_copypath"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "run.ExecutionScripts",
+          "group": "1_cutcopypaste"
+        },
+        {
+          "command": "copyRelativePath.Workspace",
+          "group": "1_cutcopypaste"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.100.1",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "eslint": "^9.39.2",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
