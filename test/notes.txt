@@ -19,3 +19,19 @@ Step 3: Running extension
     Go to Command Pallete (Ctrl+Shift+P), Commands - can see our extension command ( "Hello World" )
 
 --------------------------------------------------------------------------------------------------------------
+In extension.js,  disposable = registerCommand( fn name, fn)
+In pkg.json, contributes.commands -> {command: fn name, title: 'Displayed in cmd propelle'}
+
+And at end of activate(), "context.subscriptions.push(disposable)" should added
+--------------------------------------------------------------------------------------------------------------
+Links: 
+
+https://mehmetbaykar.com/posts/how-to-install-vscode-extension-from-your-custom-or-local-repo/#method-2-command-line-installation-vs-code-or-cursor
+
+https://stackoverflow.com/questions/59385606/is-there-any-possible-way-to-change-the-publisher-id-for-existing-vsts-extension
+
+https://code.visualstudio.com/api/working-with-extensions/publishing-extension#publishing-extensions
+
+https://stackoverflow.com/questions/60232170/vscode-extension-how-to-debug-activating-extension-undefined-publisher-extens
+
+https://code.visualstudio.com/api/working-with-extensions/publishing-extension#vsce
