@@ -10,19 +10,21 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onCommand:x"
-  ],
+  "activationEvents": [],
   "main": "extension.js",
   "contributes": {
     "commands": [
+      {
+        "command": "copyRelativePath.Workspace",
+        "title": "Copy Relative Path (Workspace)"
+      },
       {
         "command": "run.ExecutionScripts",
         "title": "Run via executionScripts.sh"
       },
       {
-        "command": "copyRelativePath.Workspace",
-        "title": "Copy Relative Path (Workspace)"
+        "command": "run.ExecutionScriptsInDebug",
+        "title": "Run via executionScripts.sh (Debug)"
       }
     ],
     "menus": {
@@ -30,16 +32,28 @@
         {
           "command": "copyRelativePath.Workspace",
           "group": "6_copypath"
+        },
+        {
+          "command": "run.ExecutionScripts",
+          "group": "6_copypath"
+        },
+        {
+          "command": "run.ExecutionScriptsInDebug",
+          "group": "6_copypath"
         }
       ],
       "editor/title/context": [
         {
           "command": "run.ExecutionScripts",
-          "group": "1_cutcopypaste"
+          "group": "0_cutcopypaste"
+        },
+        {
+          "command": "run.ExecutionScriptsInDebug",
+          "group": "0_cutcopypaste"
         },
         {
           "command": "copyRelativePath.Workspace",
-          "group": "1_cutcopypaste"
+          "group": "0_cutcopypaste"
         }
       ]
     }
