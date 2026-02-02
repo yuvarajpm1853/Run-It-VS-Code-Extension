@@ -24,6 +24,10 @@ In pkg.json, contributes.commands -> {command: fn name, title: 'Displayed in cmd
 
 And at end of activate(), "context.subscriptions.push(disposable)" should added
 --------------------------------------------------------------------------------------------------------------
+Building package
+
+npx vsce package --allow-missing-repository --allow-star-activation
+--------------------------------------------------------------------------------------------------------------
 Links: 
 
 https://mehmetbaykar.com/posts/how-to-install-vscode-extension-from-your-custom-or-local-repo/#method-2-command-line-installation-vs-code-or-cursor

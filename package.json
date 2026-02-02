@@ -1,18 +1,26 @@
 {
   "name": "RunIt",
   "displayName": "Run it",
-  "description": "Provide options to run test scripts (.js ) via executeScripts & playwright, handles allure report along with copying relative path",
-  "version": "3.1.0",
+  "description": "A productivity-focused extension for running automation scripts with terminal & debug , including Playwright & Allure.",
+  "version": "3.3.1",
   "publisher": "yuvaraj",
   "engines": {
     "vscode": "^1.100.1"
   },
+  "icon": "image/icon.png",
   "categories": [
-    "Other",
+    "Automation Solution",
+    "Automation Tool",
+    "TestScriptRunner",
+    "Playwright Runner",
     "Debugger",
-    "AutomationTester"
+    "Allure",
+    "Testing",
+    "Other"
   ],
-  "activationEvents": ["*"],
+  "activationEvents": [
+    "*"
+  ],
   "main": "extension.js",
   "contributes": {
     "commands": [
@@ -64,7 +72,7 @@
           "group": "0_copypath@3"
         },
         {
-        "command": "run.runWithPlaywright",
+          "command": "run.runWithPlaywright",
           "group": "0_copypath@6",
           "when": "resourceFilename =~ /spec\\.js$/ && workspace.hasPlaywright"
         }
@@ -91,7 +99,7 @@
           "group": "0_cutcopypaste@3"
         },
         {
-        "command": "run.runWithPlaywright",
+          "command": "run.runWithPlaywright",
           "group": "0_cutcopypaste@6",
           "when": "resourceExtname == '.js' && workspace.hasPlaywright"
         }
@@ -120,11 +128,10 @@
           "group": "0_cutcopypaste@3"
         },
         {
-        "command": "run.runWithPlaywright",
+          "command": "run.runWithPlaywright",
           "group": "0_cutcopypaste@6",
           "when": "editorLangId == 'javascript' && workspace.hasPlaywright"
         }
-
       ]
     },
     "keybindings": [
