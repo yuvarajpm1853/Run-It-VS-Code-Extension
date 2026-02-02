@@ -1,14 +1,16 @@
 {
   "name": "RunIt",
   "displayName": "Run it",
-  "description": "",
-  "version": "2.1.0",
+  "description": "Provide options to run test scripts (.js ) via executeScripts & playwright, handles allure report along with copying relative path",
+  "version": "3.1.0",
   "publisher": "yuvaraj",
   "engines": {
     "vscode": "^1.100.1"
   },
   "categories": [
-    "Other"
+    "Other",
+    "Debugger",
+    "AutomationTester"
   ],
   "activationEvents": ["*"],
   "main": "extension.js",
