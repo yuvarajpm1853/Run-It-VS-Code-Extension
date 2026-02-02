@@ -2,7 +2,7 @@
   "name": "RunIt",
   "displayName": "Run it",
   "description": "",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "publisher": "yuvaraj",
   "engines": {
     "vscode": "^1.100.1"
@@ -104,7 +104,34 @@
           "group": "0_cutcopypaste@3"
         }
       ]
-    }
+    },
+    "keybindings": [
+      {
+        "command": "run.ExecutionScripts",
+        "key": "shift+alt+x",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "run.ExecutionScriptsInDebug",
+        "key": "shift+alt+d",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "copyRelativePath.Workspace",
+        "key": "shift+alt+c",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "run.allureServe",
+        "key": "shift+alt+s",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "run.allureGenerate",
+        "key": "shift+alt+g",
+        "when": "editorTextFocus"
+      }
+    ]
   },
   "scripts": {
     "lint": "eslint .",

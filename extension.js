@@ -16,7 +16,6 @@ const lineDelimiter = isWindows ? '\r\n' : '\n';
  */
 async function activate(context) {
 
-	await openJsDebugTerminal()
 	// vscode.window.onDidChangeActiveTerminal(checkActiveTerminal);
 
 	// The command has been defined in the package.json file
@@ -48,7 +47,7 @@ async function activate(context) {
 	});
 	const allureServe = vscode.commands.registerCommand('run.allureServe', function (arg1, arg2) {
 		vscode.window.showInformationMessage('Triggered Allure serve');
-		runCmdInTerminal('allure serve ./allure-results',"Allure serve", false)
+		runCmdInTerminal('allure serve ./allure-results', "Allure serve", false)
 	});
 	const allureGenerate = vscode.commands.registerCommand('run.allureGenerate', function (arg1, arg2) {
 		vscode.window.showInformationMessage('Triggered Allure generate');
@@ -60,6 +59,7 @@ async function activate(context) {
 	context.subscriptions.push(ExecutionScriptsInDebug);
 	context.subscriptions.push(allureServe);
 	context.subscriptions.push(allureGenerate);
+	await openJsDebugTerminal()
 }
 
 function returnRelativePath(arg1, arg2) {
