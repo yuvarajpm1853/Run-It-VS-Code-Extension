@@ -27,7 +27,7 @@ async function activate(context) {
 
 		// Display a message box to the user
 		vscode.window.showInformationMessage('Copied Relative Path');
-		let relativePath = returnRelativePath(arg1, arg2)
+		let relativePath = getRelativePath(arg1, arg2)
 		if (relativePath) vscode.env.clipboard.writeText(relativePath);
 	});
 
@@ -53,16 +53,96 @@ async function activate(context) {
 		vscode.window.showInformationMessage('Triggered Allure generate');
 		runCmdInTerminal('allure generate --single-file --clean')
 	});
+	const runWithPlaywright = vscode.commands.registerCommand('run.runWithPlaywright', function (arg1, arg2) {
+		vscode.window.showInformationMessage('Triggered Allure generate');
+
+		const editor = vscode.window.activeTextEditor;
+		if (!editor) {
+			vscode.window.showWarningMessage('No active file');
+			return;
+		}
+
+		const filePath = editor.document.uri.fsPath;
+		const fileName = path.basename(filePath);
+
+		// 1️⃣ Check spec.js
+		if (!fileName.endsWith('spec.js')) {
+			vscode.window.showInformationMessage('Not a spec.js file');
+			return;
+		}
+
+		// 2️⃣ Locate package.json
+		const workspaceFolders = vscode.workspace.workspaceFolders;
+		if (!workspaceFolders) {
+			vscode.window.showErrorMessage('No workspace opened');
+			return;
+		}
+
+		const rootPath = workspaceFolders[0].uri.fsPath;
+		const packageJsonPath = path.join(rootPath, 'package.json');
+
+		if (!fs.existsSync(packageJsonPath)) {
+			vscode.window.showErrorMessage('package.json not found');
+			return;
+		}
+
+		// 3️⃣ Read package.json
+		let pkg;
+		try {
+			pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+		} catch (e) {
+			vscode.window.showErrorMessage('Invalid package.json');
+			return;
+		}
+
+		// 4️⃣ Check for Playwright
+		const deps = {
+			...pkg.dependencies,
+			...pkg.devDependencies
+		};
+
+		const hasPlaywright =
+			deps?.['@playwright/test'] || deps?.['playwright'];
+
+		if (!hasPlaywright) {
+			vscode.window.showInformationMessage('Playwright not detected');
+			return;
+		}
+
+		let relativePath = getRelativePath(arg1, arg2)
+		runCmdInTerminal(`npx playwright test ${relativePath}`, "Playwright Terminal", false)
+		// // 5️⃣ Show option
+		// const choice = await vscode.window.showQuickPick(
+		// 	[
+		// 		{
+		// 			label: 'Run with Playwright',
+		// 			description: 'npx playwright test'
+		// 		}
+		// 	],
+		// 	{ placeHolder: 'Choose how to run the test' }
+		// );
+
+		// if (!choice) return;
+
+		// // 6️⃣ Run Playwright
+		// const terminal = getOrCreateTerminal();
+		// terminal.show();
+		// terminal.sendText(`npx playwright test ${filePath}`);
+	});
 
 	context.subscriptions.push(copyRelativePath);
 	context.subscriptions.push(ExecutionScripts);
 	context.subscriptions.push(ExecutionScriptsInDebug);
 	context.subscriptions.push(allureServe);
 	context.subscriptions.push(allureGenerate);
+	context.subscriptions.push(runWithPlaywright);
+
 	await openJsDebugTerminal()
+	detectPlaywright();
+	vscode.window.showInformationMessage('Run It Extension Activated');
 }
 
-function returnRelativePath(arg1, arg2) {
+function getRelativePath(arg1, arg2) {
 	let resources;
 	if (Array.isArray(arg2)) {
 		resources = arg2;
@@ -123,18 +203,24 @@ function updateEnvFile(testPath) {
 }
 
 function updateEnvWithRelativePath(arg1, arg2) {
-	let relativePath = returnRelativePath(arg1, arg2)
+	let relativePath = getRelativePath(arg1, arg2)
 	let isUpdated = updateEnvFile(relativePath)
 	return isUpdated
 }
 
 function runCmdInTerminal(cmd, terminalName = 'Execution Scripts', closeTerminal = true) {
-	const terminal = vscode.window.createTerminal(terminalName);
+
+	const name = vscode.window.activeTerminal?.name;
+	let terminal;
+
+	if (name !== terminalName) {
+		terminal = vscode.window.createTerminal(terminalName);
+	} else terminal = vscode.window.activeTerminal;
+
 	//   terminal.show();
 
 	// For Windows Git Bash / WSL users:
 	if (isWindows) terminal.sendText(cmd);
-
 
 	// If you're sure it's executable on Linux/macOS:
 	else terminal.sendText(`./${cmd}`);
@@ -146,7 +232,7 @@ async function openJsDebugTerminalWithCwd() {
 
 	try {
 		await openJsDebugTerminal()
-		const name3 = vscode.window.activeTerminal?.name;
+		// const name3 = vscode.window.activeTerminal?.name;
 		const terminal = vscode.window.activeTerminal;
 		if (terminal) {
 			terminal.sendText(`executeScripts.sh`);
@@ -315,7 +401,28 @@ async function openJsDebugTerminalWithCwd2(cwdUri, command = "executionScripts.s
 		'Opened regular terminal (JavaScript Debug features not available)'
 	);
 }
+async function detectPlaywright() {
+	const folders = vscode.workspace.workspaceFolders;
+	if (!folders) return;
 
+	const pkgPath = path.join(folders[0].uri.fsPath, 'package.json');
+	if (!fs.existsSync(pkgPath)) return;
+
+	const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+	const deps = {
+		...pkg.dependencies,
+		...pkg.devDependencies
+	};
+
+	const hasPlaywright =
+		deps?.['@playwright/test'] || deps?.['playwright'];
+
+	await vscode.commands.executeCommand(
+		'setContext',
+		'workspace.hasPlaywright',
+		!!hasPlaywright
+	);
+}
 // function runExecInDebug(filePath, isDebug = false) {
 
 // // opens debug terminal but cant run executeScripts.sh
@@ -337,6 +444,29 @@ async function openJsDebugTerminalWithCwd2(cwdUri, command = "executionScripts.s
 // }
 
 // This method is called when your extension is deactivated
+async function detectPlaywright() {
+	const folders = vscode.workspace.workspaceFolders;
+	if (!folders) return;
+
+	const pkgPath = path.join(folders[0].uri.fsPath, 'package.json');
+	if (!fs.existsSync(pkgPath)) return;
+
+	const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+	const deps = {
+		...pkg.dependencies,
+		...pkg.devDependencies
+	};
+
+	const hasPlaywright =
+		deps?.['@playwright/test'] || deps?.['playwright'];
+
+	await vscode.commands.executeCommand(
+		'setContext',
+		'workspace.hasPlaywright',
+		!!hasPlaywright
+	);
+}
+
 function deactivate() { }
 
 module.exports = {

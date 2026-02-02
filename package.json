@@ -10,7 +10,7 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": ["*"],
   "main": "extension.js",
   "contributes": {
     "commands": [
@@ -33,6 +33,10 @@
       {
         "command": "run.allureGenerate",
         "title": "(Allure) Generate Report"
+      },
+      {
+        "command": "run.runWithPlaywright",
+        "title": "Run with Playwright"
       }
     ],
     "menus": {
@@ -56,6 +60,11 @@
         {
           "command": "run.allureGenerate",
           "group": "0_copypath@3"
+        },
+        {
+        "command": "run.runWithPlaywright",
+          "group": "0_copypath@6",
+          "when": "resourceFilename =~ /spec\\.js$/ && workspace.hasPlaywright"
         }
       ],
       "editor/title/context": [
@@ -78,6 +87,11 @@
         {
           "command": "run.allureGenerate",
           "group": "0_cutcopypaste@3"
+        },
+        {
+        "command": "run.runWithPlaywright",
+          "group": "0_cutcopypaste@6",
+          "when": "resourceExtname == '.js' && workspace.hasPlaywright"
         }
       ],
       "editor/context": [
@@ -102,7 +116,13 @@
         {
           "command": "run.allureGenerate",
           "group": "0_cutcopypaste@3"
+        },
+        {
+        "command": "run.runWithPlaywright",
+          "group": "0_cutcopypaste@6",
+          "when": "editorLangId == 'javascript' && workspace.hasPlaywright"
         }
+
       ]
     },
     "keybindings": [
@@ -129,6 +149,11 @@
       {
         "command": "run.allureGenerate",
         "key": "shift+alt+g",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "run.runWithPlaywright",
+        "key": "shift+alt+p",
         "when": "editorTextFocus"
       }
     ]
