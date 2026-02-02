@@ -1,21 +1,16 @@
 {
-  "name": "RunIt",
-  "displayName": "Run it",
+  "name": "OneClickRun",
+  "displayName": "OneClickRun",
   "description": "A productivity-focused extension for running automation scripts with terminal & debug , including Playwright & Allure.",
-  "version": "3.3.1",
-  "publisher": "yuvaraj",
+  "version": "3.3.3",
+  "publisher": "yuvarajpm1853",
   "engines": {
     "vscode": "^1.100.1"
   },
   "icon": "image/icon.png",
   "categories": [
-    "Automation Solution",
-    "Automation Tool",
-    "TestScriptRunner",
-    "Playwright Runner",
-    "Debugger",
-    "Allure",
     "Testing",
+    "Debuggers",
     "Other"
   ],
   "activationEvents": [
@@ -167,6 +162,17 @@
       }
     ]
   },
+  "keywords": [
+    "Automation Solution",
+    "playwright",
+    "test automation",
+    "script runner",
+    "allure",
+    "debug",
+    "one click run",
+    "testing",
+    "automation testing"
+  ],
   "scripts": {
     "lint": "eslint .",
     "pretest": "npm run lint",
@@ -179,5 +185,9 @@
     "eslint": "^9.39.2",
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yuvarajpm1853/Run-It-VS-Code-Extension"
   }
 }

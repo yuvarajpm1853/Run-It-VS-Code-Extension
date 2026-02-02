@@ -1,7 +1,7 @@
-# RunIt VS Code Extension
+# OneClickRun VS Code Extension
 
 ## Overview
-RunIt is a Visual Studio Code extension that provides options to run test scripts (.js) via executeScripts & Playwright, handles Allure report generation and serving, and allows copying relative paths.
+OneClickRun is a Visual Studio Code extension that provides options to run test scripts (.js) via executeScripts & Playwright, handles Allure report generation and serving, and allows copying relative paths.
 
 ## Features
 - Run test scripts using executionScripts.sh
@@ -38,10 +38,13 @@ RunIt is a Visual Studio Code extension that provides options to run test script
 ## Images
 
 ![1770049717628](image/README/1770049717628.png)
+
 ![1770049826967](image/README/1770049826967.png)
+
 ![1770049886049](image/README/1770049886049.png)
 
-## Pseudo Option
+## Pseudo Option: 
+Option only enables when file extension ends with "spec.js" and package.json contains "playwright"
 
 ![1770049976869](image/README/1770049976869.png)
 
