@@ -1,3 +1,4 @@
+// @ts-nocheck
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
@@ -13,11 +14,15 @@ const lineDelimiter = isWindows ? '\r\n' : '\n';
 /**
  * @param {vscode.ExtensionContext} context
  */
-function activate(context) {
+async function activate(context) {
+
+	await openJsDebugTerminal()
+	// vscode.window.onDidChangeActiveTerminal(checkActiveTerminal);
 
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with  registerCommand
 	// The commandId parameter must match the command field in package.json
+
 	const copyRelativePath = vscode.commands.registerCommand('copyRelativePath.Workspace', function (arg1, arg2) {
 		// The code you place here will be executed every time your command is executed
 
@@ -31,7 +36,7 @@ function activate(context) {
 		let isUpdated = updateEnvWithRelativePath(arg1, arg2)
 		if (isUpdated) {
 			vscode.window.showInformationMessage('Updated .env & triggered executeScripts.sh');
-			runExecutionScript()
+			runCmdInTerminal('executeScripts.sh')
 		}
 	});
 	const ExecutionScriptsInDebug = vscode.commands.registerCommand('run.ExecutionScriptsInDebug', function (arg1, arg2) {
@@ -41,10 +46,20 @@ function activate(context) {
 			openJsDebugTerminalWithCwd()
 		}
 	});
+	const allureServe = vscode.commands.registerCommand('run.allureServe', function (arg1, arg2) {
+		vscode.window.showInformationMessage('Triggered Allure serve');
+		runCmdInTerminal('allure serve ./allure-results',"Allure serve", false)
+	});
+	const allureGenerate = vscode.commands.registerCommand('run.allureGenerate', function (arg1, arg2) {
+		vscode.window.showInformationMessage('Triggered Allure generate');
+		runCmdInTerminal('allure generate --single-file --clean')
+	});
 
 	context.subscriptions.push(copyRelativePath);
 	context.subscriptions.push(ExecutionScripts);
 	context.subscriptions.push(ExecutionScriptsInDebug);
+	context.subscriptions.push(allureServe);
+	context.subscriptions.push(allureGenerate);
 }
 
 function returnRelativePath(arg1, arg2) {
@@ -113,20 +128,37 @@ function updateEnvWithRelativePath(arg1, arg2) {
 	return isUpdated
 }
 
-function runExecutionScript() {
-	const terminal = vscode.window.createTerminal('Execution Scripts');
+function runCmdInTerminal(cmd, terminalName = 'Execution Scripts', closeTerminal = true) {
+	const terminal = vscode.window.createTerminal(terminalName);
 	//   terminal.show();
 
 	// For Windows Git Bash / WSL users:
-	if (isWindows) terminal.sendText('executeScripts.sh');
+	if (isWindows) terminal.sendText(cmd);
+
 
 	// If you're sure it's executable on Linux/macOS:
-	else terminal.sendText('./executionScripts.sh');
-	setTimeout(() => { terminal.dispose(); }, 1000); // 1 seconds
+	else terminal.sendText(`./${cmd}`);
+	if (closeTerminal) setTimeout(() => { terminal.dispose(); }, 1000); // 1 seconds
 }
 
-// async function openJsDebugTerminalWithCwd(cwdUri, command = "executionScripts.sh") {
+// async function openJsDebugTerminalWithCwd12(cwdUri, command = "executionScripts.sh") {
 async function openJsDebugTerminalWithCwd() {
+
+	try {
+		await openJsDebugTerminal()
+		const name3 = vscode.window.activeTerminal?.name;
+		const terminal = vscode.window.activeTerminal;
+		if (terminal) {
+			terminal.sendText(`executeScripts.sh`);
+
+			// cant dispose debug terminal - show available until execution close
+			// setTimeout(() => { terminal.dispose(); }, 30000); // 5 seconds
+		}
+	} catch (error) {
+		console.log('[Debug Terminal] Failed to use official command:', error);
+	}
+}
+async function openJsDebugTerminal() {
 	// The official command provided by VS Code's built-in JavaScript Debugger
 	const officialJsDebugCommand = 'extension.js-debug.createDebuggerTerminal';
 
@@ -138,15 +170,81 @@ async function openJsDebugTerminalWithCwd() {
 		if (jsDebugExtension && !jsDebugExtension.isActive) {
 			console.log('[Debug Terminal] Activating JavaScript Debugger extension directly...');
 			await jsDebugExtension.activate();
-			
+
 			// Give it a moment to fully initialize
-			// await new Promise(resolve => setTimeout(resolve, 5000));
+			await new Promise(resolve => setTimeout(resolve, 5000));
 		}
 
 		console.log('[Debug Terminal] Attempting to use official JS Debug command...');
 
 		// Strategy 1: Try to use the official JS Debug command
 		// This is the most reliable method when available
+
+		const name = await vscode.window.activeTerminal?.name;
+		if (name !== "JavaScript Debug Terminal") {
+			// Get all available commands to check if the JS Debug command exists
+			const availableCommands = await vscode.commands.getCommands(true);
+
+			if (availableCommands.includes(officialJsDebugCommand)) {
+				console.log('[Debug Terminal] Official JS Debug command found, using it...');
+
+				// Execute the command with the current working directory
+				await vscode.commands.executeCommand(officialJsDebugCommand);
+
+				console.log('[Debug Terminal] Successfully opened using official command');
+				await vscode.window.onDidChangeActiveTerminal(checkActiveTerminal);
+				return; // Success! Exit early
+			} else {
+				console.log('[Debug Terminal] Official JS Debug command not available');
+			}
+		}
+	} catch (error) {
+		console.log('[Debug Terminal] Failed to use official command:', error);
+		// Continue to next strategy
+	}
+}
+function checkActiveTerminal() {
+	const { activeTerminal } = vscode.window;
+	console.log("activeTerminal: " + (activeTerminal ? activeTerminal.name : "<none>"));
+}
+async function openJsDebugTerminalWithCwd2(cwdUri, command = "executionScripts.sh") {
+	// The official command provided by VS Code's built-in JavaScript Debugger
+	const officialJsDebugCommand = 'extension.js-debug.createDebuggerTerminal';
+
+	// Pre-step: Ensure JavaScript Debugger extension is activated
+	// This is crucial because the extension is lazy-loaded and may not be available initially
+	try {
+		console.log('[Debug Terminal] Ensuring JavaScript Debugger extension is activated...');
+
+		// Method 1: Try to get and activate the JS Debug extension directly
+		const jsDebugExtension = vscode.extensions.getExtension('ms-vscode.js-debug');
+
+		if (jsDebugExtension && !jsDebugExtension.isActive) {
+			console.log('[Debug Terminal] Activating JavaScript Debugger extension directly...');
+			await jsDebugExtension.activate();
+
+			// Give it a moment to fully initialize
+			await new Promise(resolve => setTimeout(resolve, 1000));
+		}
+
+		// Method 2: Alternative activation by trying to access terminal profiles
+		// This can trigger the debugger extension to load if it hasn't already
+		try {
+			await vscode.commands.executeCommand('workbench.action.terminal.showProfiles');
+			await new Promise(resolve => setTimeout(resolve, 500));
+		} catch {
+			// Ignore - this is just an attempt to trigger activation
+		}
+
+	} catch (error) {
+		console.log('[Debug Terminal] Could not activate JS Debug extension:', error);
+		// Continue anyway - might still work
+	}
+
+	// Strategy 1: Try to use the official JS Debug command
+	// This is the most reliable method when available
+	try {
+		console.log('[Debug Terminal] Attempting to use official JS Debug command...');
 
 		// Get all available commands to check if the JS Debug command exists
 		const availableCommands = await vscode.commands.getCommands(true);
@@ -155,13 +253,15 @@ async function openJsDebugTerminalWithCwd() {
 			console.log('[Debug Terminal] Official JS Debug command found, using it...');
 
 			// Execute the command with the current working directory
-			await vscode.commands.executeCommand(officialJsDebugCommand);
+			await vscode.commands.executeCommand(officialJsDebugCommand, {
+				cwd: cwdUri?.fsPath ?? undefined
+			});
 
 			console.log('[Debug Terminal] Successfully opened using official command');
 			const terminal = vscode.window.activeTerminal;
 			if (terminal) {
 				terminal.sendText(`executeScripts.sh`);
-				setTimeout(() => { terminal.dispose(); }, 1000); // 5 seconds
+				// vscode.window.showInformationMessage(`Running: npm run ${scriptName}`);
 			}
 
 			return; // Success! Exit early
@@ -172,6 +272,48 @@ async function openJsDebugTerminalWithCwd() {
 		console.log('[Debug Terminal] Failed to use official command:', error);
 		// Continue to next strategy
 	}
+
+	// Strategy 2: Try to create a terminal using the JavaScript Debug Terminal profile
+	// This profile is usually available if the JavaScript Debugger extension is active
+	try {
+		console.log('[Debug Terminal] Attempting to use JavaScript Debug Terminal profile...');
+
+		await vscode.commands.executeCommand('workbench.action.terminal.newWithProfile', {
+			profileName: 'JavaScript Debug Terminal',
+			cwd: cwdUri?.fsPath ?? undefined
+		});
+
+		console.log('[Debug Terminal] Successfully opened using terminal profile');
+		// Send the npm run command to the terminal
+		return; // Success! Exit early
+	} catch (error) {
+		console.log('[Debug Terminal] Failed to use terminal profile:', error);
+		// Continue to final fallback
+	}
+
+	// Strategy 3: Final fallback - create a regular integrated terminal
+	// This always works but doesn't have debug capabilities
+	console.log('[Debug Terminal] Using fallback: creating regular terminal...');
+
+	const terminal = vscode.window.createTerminal({
+		name: 'JavaScript Debug Terminal (Fallback)',
+		cwd: cwdUri // VS Code handles URI to path conversion automatically
+	});
+
+	// Show the terminal to the user
+	terminal.show();
+
+	console.log('[Debug Terminal] Successfully created fallback terminal');
+
+	// If a command was provided, send it to the terminal
+	if (command) {
+		terminal.sendText(command);
+	}
+
+	// Inform user about the fallback
+	vscode.window.showInformationMessage(
+		'Opened regular terminal (JavaScript Debug features not available)'
+	);
 }
 
 // function runExecInDebug(filePath, isDebug = false) {

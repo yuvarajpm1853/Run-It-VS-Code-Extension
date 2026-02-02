@@ -1,8 +1,8 @@
 {
-  "name": "helloWorld",
-  "displayName": "Hello ",
+  "name": "RunIt",
+  "displayName": "Run it",
   "description": "",
-  "version": "0.0.1",
+  "version": "2.0.0",
   "publisher": "yuvaraj",
   "engines": {
     "vscode": "^1.100.1"
@@ -25,35 +25,83 @@
       {
         "command": "run.ExecutionScriptsInDebug",
         "title": "Run via executionScripts.sh (Debug)"
+      },
+      {
+        "command": "run.allureServe",
+        "title": "(Allure) Serve Report"
+      },
+      {
+        "command": "run.allureGenerate",
+        "title": "(Allure) Generate Report"
       }
     ],
     "menus": {
       "explorer/context": [
         {
           "command": "copyRelativePath.Workspace",
-          "group": "6_copypath"
+          "group": "0_copypath@1"
         },
         {
           "command": "run.ExecutionScripts",
-          "group": "6_copypath"
+          "group": "0_copypath@4"
         },
         {
           "command": "run.ExecutionScriptsInDebug",
-          "group": "6_copypath"
+          "group": "0_copypath@5"
+        },
+        {
+          "command": "run.allureServe",
+          "group": "0_copypath@2"
+        },
+        {
+          "command": "run.allureGenerate",
+          "group": "0_copypath@3"
         }
       ],
       "editor/title/context": [
         {
           "command": "run.ExecutionScripts",
-          "group": "0_cutcopypaste"
+          "group": "0_cutcopypaste@4"
         },
         {
           "command": "run.ExecutionScriptsInDebug",
-          "group": "0_cutcopypaste"
+          "group": "0_cutcopypaste@5"
         },
         {
           "command": "copyRelativePath.Workspace",
-          "group": "0_cutcopypaste"
+          "group": "0_cutcopypaste@1"
+        },
+        {
+          "command": "run.allureServe",
+          "group": "0_cutcopypaste@2"
+        },
+        {
+          "command": "run.allureGenerate",
+          "group": "0_cutcopypaste@3"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "run.ExecutionScripts",
+          "group": "0_cutcopypaste@4",
+          "when": "resourceExtname =~ /\\.(js|ts)$/ || resourceFilename =~ /(package\\.json|package-lock\\.json|yarn\\.lock|tsconfig\\.json|\\.nvmrc|\\.node-version)$/ || editorLangId == 'javascript' || editorLangId == 'typescript'"
+        },
+        {
+          "command": "run.ExecutionScriptsInDebug",
+          "group": "0_cutcopypaste@5",
+          "when": "resourceExtname =~ /\\.(js|ts)$/ || resourceFilename =~ /(package\\.json|package-lock\\.json|yarn\\.lock|tsconfig\\.json|\\.nvmrc|\\.node-version)$/ || editorLangId == 'javascript' || editorLangId == 'typescript'"
+        },
+        {
+          "command": "copyRelativePath.Workspace",
+          "group": "0_cutcopypaste@1"
+        },
+        {
+          "command": "run.allureServe",
+          "group": "0_cutcopypaste@2"
+        },
+        {
+          "command": "run.allureGenerate",
+          "group": "0_cutcopypaste@3"
         }
       ]
     }
