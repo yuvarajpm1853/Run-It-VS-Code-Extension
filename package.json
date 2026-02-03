@@ -2,7 +2,7 @@
   "name": "OneClickRun",
   "displayName": "OneClickRun",
   "description": "A productivity-focused extension for running automation scripts with terminal & debug , including Playwright & Allure.",
-  "version": "3.3.3",
+  "version": "3.3.6",
   "publisher": "yuvarajpm1853",
   "engines": {
     "vscode": "^1.100.1"

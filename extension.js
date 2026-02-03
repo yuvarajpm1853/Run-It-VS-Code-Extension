@@ -34,16 +34,16 @@ async function activate(context) {
 	});
 
 	const ExecutionScripts = vscode.commands.registerCommand('run.ExecutionScripts', function (arg1, arg2) {
-		let isUpdated = updateEnvWithRelativePath(arg1, arg2)
+		let { isUpdated, fileName } = updateEnvWithRelativePath(arg1, arg2)
 		if (isUpdated) {
-			vscode.window.setStatusBarMessage('✅ Updated .env & triggered executeScripts.sh', 3000);
+			vscode.window.setStatusBarMessage(`✅ Running: ${fileName}`, 3000);
 			runCmdInTerminal('executeScripts.sh')
 		}
 	});
 	const ExecutionScriptsInDebug = vscode.commands.registerCommand('run.ExecutionScriptsInDebug', function (arg1, arg2) {
-		let isUpdated = updateEnvWithRelativePath(arg1, arg2)
+		let { isUpdated, fileName } = updateEnvWithRelativePath(arg1, arg2)
 		if (isUpdated) {
-			vscode.window.setStatusBarMessage('✅ (Debug) Updated .env & triggered executeScripts.sh', 3000);
+			vscode.window.setStatusBarMessage(`✅ (Debug) Running: ${fileName}`, 3000);
 			openJsDebugTerminalWithCwd()
 		}
 	});
@@ -142,7 +142,9 @@ function updateEnvWithRelativePath(arg1, arg2) {
 	relativePath = resolveRelativeTestPath(relativePath)
 
 	let isUpdated = updateEnvFile(relativePath)
-	return isUpdated
+	const fileName = path.basename(relativePath);
+
+	return { isUpdated, relativePath, fileName }
 }
 
 function runCmdInTerminal(cmd, terminalName = 'Execution Scripts', closeTerminal = true) {
@@ -171,6 +173,8 @@ async function openJsDebugTerminalWithCwd() {
 		// const name3 = vscode.window.activeTerminal?.name;
 		let terminal = vscode.window.activeTerminal;
 		if (terminal?.name !== "JavaScript Debug Terminal") await openJsDebugTerminal();
+		else terminal.sendText('');          // New line
+
 		// terminal.show();
 		terminal = vscode.window.activeTerminal;
 		const name3 = vscode.window.activeTerminal?.name;
