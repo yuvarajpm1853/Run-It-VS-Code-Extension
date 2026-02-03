@@ -65,5 +65,4 @@ This option is enabled only when:
 
 ## Status Message
 ![status Message](image/README/1770092798432.png)
-<img alt="image" src="https://github.com/user-attachments/assets/19612c69-a736-4ea3-b1c0-ec04273e324b" />
 
