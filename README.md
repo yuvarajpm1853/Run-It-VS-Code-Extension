@@ -62,3 +62,7 @@ This option is enabled only when:
 - Playwright is present in the workspace `package.json`
 
 ![1770049976869](image/README/1770049976869.png)
+
+## Status Message
+<img width="1911" height="1071" alt="image" src="https://github.com/user-attachments/assets/19612c69-a736-4ea3-b1c0-ec04273e324b" />
+
