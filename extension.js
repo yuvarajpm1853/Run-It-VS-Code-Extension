@@ -169,14 +169,16 @@ async function openJsDebugTerminalWithCwd() {
 	try {
 		await openJsDebugTerminal()
 		// const name3 = vscode.window.activeTerminal?.name;
-		const terminal = vscode.window.activeTerminal;
-		if (terminal) {
-			// terminal.show();
-			terminal.sendText(`executeScripts.sh`);
+		let terminal = vscode.window.activeTerminal;
+		if (terminal?.name !== "JavaScript Debug Terminal") await openJsDebugTerminal();
+		// terminal.show();
+		terminal = vscode.window.activeTerminal;
+		const name3 = vscode.window.activeTerminal?.name;
+		terminal.sendText(`executeScripts.sh`);
 
-			// cant dispose debug terminal - show available until execution close
-			// setTimeout(() => { terminal.dispose(); }, 30000); // 5 seconds
-		}
+		// cant dispose debug terminal - show available until execution close
+		// setTimeout(() => { terminal.dispose(); }, 30000); // 5 seconds
+
 	} catch (error) {
 		console.log('[Debug Terminal] Failed to use official command:', error);
 	}

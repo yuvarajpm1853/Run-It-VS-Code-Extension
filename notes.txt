@@ -27,6 +27,7 @@ And at end of activate(), "context.subscriptions.push(disposable)" should added
 Building package
 
 npx vsce package --allow-missing-repository --allow-star-activation
+vsce publish
 --------------------------------------------------------------------------------------------------------------
 Links: 
 
