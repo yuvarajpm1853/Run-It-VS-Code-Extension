@@ -33,29 +33,29 @@ async function activate(context) {
 		if (relativePath) vscode.env.clipboard.writeText(relativePath);
 	});
 
-	const ExecutionScripts = vscode.commands.registerCommand('run.ExecutionScripts', function (arg1, arg2) {
+	const ExecutionScripts = vscode.commands.registerCommand('oneClickRun.ExecutionScripts', function (arg1, arg2) {
 		let { isUpdated, fileName } = updateEnvWithRelativePath(arg1, arg2)
 		if (isUpdated) {
 			vscode.window.setStatusBarMessage(`✅ Running: ${fileName}`, 3000);
 			runCmdInTerminal('executeScripts.sh')
 		}
 	});
-	const ExecutionScriptsInDebug = vscode.commands.registerCommand('run.ExecutionScriptsInDebug', function (arg1, arg2) {
+	const ExecutionScriptsInDebug = vscode.commands.registerCommand('oneClickRun.ExecutionScriptsInDebug', function (arg1, arg2) {
 		let { isUpdated, fileName } = updateEnvWithRelativePath(arg1, arg2)
 		if (isUpdated) {
 			vscode.window.setStatusBarMessage(`✅ (Debug) Running: ${fileName}`, 3000);
 			openJsDebugTerminalWithCwd()
 		}
 	});
-	const allureServe = vscode.commands.registerCommand('run.allureServe', function (arg1, arg2) {
+	const allureServe = vscode.commands.registerCommand('oneClickRun.allureServe', function (arg1, arg2) {
 		vscode.window.setStatusBarMessage('✅ Opening allure report', 3000);
 		runCmdInTerminal('allure serve ./allure-results', "Allure serve", false)
 	});
-	const allureGenerate = vscode.commands.registerCommand('run.allureGenerate', function (arg1, arg2) {
+	const allureGenerate = vscode.commands.registerCommand('oneClickRun.allureGenerate', function (arg1, arg2) {
 		vscode.window.setStatusBarMessage('✅ Generated allure report', 3000);
 		runCmdInTerminal('allure generate --single-file --clean')
 	});
-	const runWithPlaywright = vscode.commands.registerCommand('run.runWithPlaywright', function (arg1, arg2) {
+	const runWithPlaywright = vscode.commands.registerCommand('oneClickRun.runWithPlaywright', function (arg1, arg2) {
 		let isPlaywright = checkPlaywright()
 		if (isPlaywright) {
 			let relativePath = getRelativePath(arg1, arg2)
@@ -64,12 +64,28 @@ async function activate(context) {
 		}
 	});
 
+	updateHeadlessContext();
+
+	let setHeadlessTrue = vscode.commands.registerCommand('oneClickRun.setHeadlessTrue', async function () {
+		await updateHeadlessValue()
+	})
+	let setHeadlessFalse = vscode.commands.registerCommand('oneClickRun.setHeadlessFalse', async function () {
+		await updateHeadlessValue()
+	})
+
+	vscode.workspace.onDidSaveTextDocument(doc => {
+		if (doc.fileName.endsWith('.env')) {
+			updateHeadlessContext();
+		}
+	});
 	context.subscriptions.push(copyRelativePath);
 	context.subscriptions.push(ExecutionScripts);
 	context.subscriptions.push(ExecutionScriptsInDebug);
 	context.subscriptions.push(allureServe);
 	context.subscriptions.push(allureGenerate);
 	context.subscriptions.push(runWithPlaywright);
+	context.subscriptions.push(setHeadlessTrue);
+	context.subscriptions.push(setHeadlessFalse);
 
 	await openJsDebugTerminal()
 	detectPlaywright();
@@ -440,6 +456,61 @@ function checkPlaywright() {
 	}
 	return true
 }
+function readHeadlessFromEnv() {
+	const workspace = vscode.workspace.workspaceFolders?.[0];
+	if (!workspace) return null;
+
+	const envPath = path.join(workspace.uri.fsPath, '.env');
+	if (!fs.existsSync(envPath)) return null;
+
+	const content = fs.readFileSync(envPath, 'utf8');
+
+	const match = content.match(/^HEADLESS\s*=\s*(true|false)/mi);
+	if (!match) return null;
+
+	return match[1].toLowerCase() === 'true';
+}
+async function updateHeadlessContext() {
+	const headless = readHeadlessFromEnv();
+
+	await vscode.commands.executeCommand(
+		'setContext',
+		'oneClickRun.hasHeadless',
+		headless !== null
+	);
+
+	await vscode.commands.executeCommand(
+		'setContext',
+		'oneClickRun.headlessValue',
+		headless
+	);
+}
+
+async function updateHeadlessValue(value) {
+	const workspace = vscode.workspace.workspaceFolders?.[0];
+	if (!workspace) return;
+
+	const envPath = path.join(workspace.uri.fsPath, '.env');
+	if (!fs.existsSync(envPath)) return;
+
+	let content = fs.readFileSync(envPath, 'utf8');
+
+	const current = readHeadlessFromEnv();
+	const next = !current;
+
+	content = content.replace(
+		/^HEADLESS\s*=\s*(true|false)/mi,
+		`HEADLESS=${next}`
+	);
+
+	fs.writeFileSync(envPath, content);
+	await updateHeadlessContext();
+
+	vscode.window.setStatusBarMessage(
+		`✅ HEADLESS set to ${next}`
+	);
+}
+
 function deactivate() { }
 
 module.exports = {

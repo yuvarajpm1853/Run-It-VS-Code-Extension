@@ -24,24 +24,32 @@
         "title": "Copy Relative Path (Workspace)"
       },
       {
-        "command": "run.ExecutionScripts",
+        "command": "oneClickRun.ExecutionScripts",
         "title": "Run via executionScripts.sh"
       },
       {
-        "command": "run.ExecutionScriptsInDebug",
+        "command": "oneClickRun.ExecutionScriptsInDebug",
         "title": "Run via executionScripts.sh (Debug)"
       },
       {
-        "command": "run.allureServe",
+        "command": "oneClickRun.allureServe",
         "title": "(Allure) Serve Report"
       },
       {
-        "command": "run.allureGenerate",
+        "command": "oneClickRun.allureGenerate",
         "title": "(Allure) Generate Report"
       },
       {
-        "command": "run.runWithPlaywright",
-        "title": "Run with Playwright"
+        "command": "oneClickRun.runWithPlaywright",
+        "title": "Run with playwright"
+      },
+      {
+        "command": "oneClickRun.setHeadlessTrue",
+        "title": "Set headless to true"
+      },
+      {
+        "command": "oneClickRun.setHeadlessFalse",
+        "title": "Set headless to false"
       }
     ],
     "menus": {
@@ -51,92 +59,86 @@
           "group": "0_copypath@1"
         },
         {
-          "command": "run.ExecutionScripts",
-          "group": "0_copypath@4"
-        },
-        {
-          "command": "run.ExecutionScriptsInDebug",
-          "group": "0_copypath@5"
-        },
-        {
-          "command": "run.allureServe",
+          "command": "oneClickRun.ExecutionScripts",
           "group": "0_copypath@2"
         },
         {
-          "command": "run.allureGenerate",
+          "command": "oneClickRun.ExecutionScriptsInDebug",
           "group": "0_copypath@3"
         },
         {
-          "command": "run.runWithPlaywright",
+          "command": "oneClickRun.runWithPlaywright",
           "group": "0_copypath@6",
           "when": "resourceFilename =~ /spec\\.js$/ && workspace.hasPlaywright"
+        },
+        {
+          "command": "oneClickRun.setHeadlessTrue",
+          "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == false",
+          "group": "0_copypath@7"
+        },
+        {
+          "command": "oneClickRun.setHeadlessFalse",
+          "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == true",
+          "group": "0_copypath@7"
         }
       ],
       "editor/title/context": [
         {
-          "command": "run.ExecutionScripts",
-          "group": "0_cutcopypaste@4"
+          "command": "oneClickRun.ExecutionScripts",
+          "group": "0_cutcopypaste@2"
         },
         {
-          "command": "run.ExecutionScriptsInDebug",
-          "group": "0_cutcopypaste@5"
+          "command": "oneClickRun.ExecutionScriptsInDebug",
+          "group": "0_cutcopypaste@3"
         },
         {
           "command": "copyRelativePath.Workspace",
           "group": "0_cutcopypaste@1"
         },
         {
-          "command": "run.allureServe",
-          "group": "0_cutcopypaste@2"
-        },
-        {
-          "command": "run.allureGenerate",
-          "group": "0_cutcopypaste@3"
-        },
-        {
-          "command": "run.runWithPlaywright",
+          "command": "oneClickRun.runWithPlaywright",
           "group": "0_cutcopypaste@6",
           "when": "resourceExtname == '.js' && workspace.hasPlaywright"
         }
       ],
       "editor/context": [
         {
-          "command": "run.ExecutionScripts",
-          "group": "0_cutcopypaste@4",
-          "when": "resourceExtname =~ /\\.(js|ts)$/ || resourceFilename =~ /(package\\.json|package-lock\\.json|yarn\\.lock|tsconfig\\.json|\\.nvmrc|\\.node-version)$/ || editorLangId == 'javascript' || editorLangId == 'typescript'"
+          "command": "oneClickRun.ExecutionScripts",
+          "group": "0_cutcopypaste@2",
+          "when": "resourceExtname == 'js' || resourceExtname == 'ts'"
         },
         {
-          "command": "run.ExecutionScriptsInDebug",
-          "group": "0_cutcopypaste@5",
-          "when": "resourceExtname =~ /\\.(js|ts)$/ || resourceFilename =~ /(package\\.json|package-lock\\.json|yarn\\.lock|tsconfig\\.json|\\.nvmrc|\\.node-version)$/ || editorLangId == 'javascript' || editorLangId == 'typescript'"
+          "command": "oneClickRun.ExecutionScriptsInDebug",
+          "group": "0_cutcopypaste@3",
+          "when": "resourceExtname == 'js' || resourceExtname == 'ts'"
         },
         {
           "command": "copyRelativePath.Workspace",
           "group": "0_cutcopypaste@1"
         },
         {
-          "command": "run.allureServe",
+          "command": "oneClickRun.allureServe",
           "group": "0_cutcopypaste@2"
         },
         {
-          "command": "run.allureGenerate",
+          "command": "oneClickRun.allureGenerate",
           "group": "0_cutcopypaste@3"
         },
         {
-          "command": "run.runWithPlaywright",
+          "command": "oneClickRun.runWithPlaywright",
           "group": "0_cutcopypaste@6",
-          "when": "editorLangId == 'javascript' && workspace.hasPlaywright"
+          "when": "resourceFilename =~ /\\.spec\\.js$/ && workspace.hasPlaywright"
         }
       ]
     },
     "keybindings": [
       {
-        "command": "run.ExecutionScripts",
+        "command": "oneClickRun.ExecutionScripts",
         "key": "shift+alt+x",
         "when": "editorTextFocus"
       },
       {
-        "command": "run.ExecutionScriptsInDebug",
+        "command": "oneClickRun.ExecutionScriptsInDebug",
         "key": "shift+alt+d",
         "when": "editorTextFocus"
       },
@@ -146,17 +148,17 @@
         "when": "editorTextFocus"
       },
       {
-        "command": "run.allureServe",
+        "command": "oneClickRun.allureServe",
         "key": "shift+alt+s",
         "when": "editorTextFocus"
       },
       {
-        "command": "run.allureGenerate",
+        "command": "oneClickRun.allureGenerate",
         "key": "shift+alt+g",
         "when": "editorTextFocus"
       },
       {
-        "command": "run.runWithPlaywright",
+        "command": "oneClickRun.runWithPlaywright",
         "key": "shift+alt+p",
         "when": "editorTextFocus"
       }
