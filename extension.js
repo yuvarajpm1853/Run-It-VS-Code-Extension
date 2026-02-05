@@ -507,7 +507,7 @@ async function updateHeadlessValue(value) {
 	await updateHeadlessContext();
 
 	vscode.window.setStatusBarMessage(
-		`✅ HEADLESS set to ${next}`
+		`✅ headless set to ${next}`
 	);
 }
 

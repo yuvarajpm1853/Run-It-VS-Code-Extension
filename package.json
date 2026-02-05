@@ -60,11 +60,13 @@
         },
         {
           "command": "oneClickRun.ExecutionScripts",
-          "group": "0_copypath@2"
+          "group": "0_copypath@2",
+          "when": "resourceExtname == '.js'"
         },
         {
           "command": "oneClickRun.ExecutionScriptsInDebug",
-          "group": "0_copypath@3"
+          "group": "0_copypath@3",
+          "when": "resourceExtname == '.js'"
         },
         {
           "command": "oneClickRun.runWithPlaywright",
@@ -73,61 +75,83 @@
         },
         {
           "command": "oneClickRun.setHeadlessTrue",
-          "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == false",
+          "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == false && resourceExtname == '.js'",
           "group": "0_copypath@7"
         },
         {
           "command": "oneClickRun.setHeadlessFalse",
-          "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == true",
+          "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == true && resourceExtname == '.js'",
           "group": "0_copypath@7"
         }
       ],
       "editor/title/context": [
         {
-          "command": "oneClickRun.ExecutionScripts",
-          "group": "0_cutcopypaste@2"
-        },
-        {
-          "command": "oneClickRun.ExecutionScriptsInDebug",
-          "group": "0_cutcopypaste@3"
-        },
-        {
           "command": "copyRelativePath.Workspace",
           "group": "0_cutcopypaste@1"
         },
         {
+          "command": "oneClickRun.ExecutionScripts",
+          "group": "0_cutcopypaste@2",
+          "when": "resourceExtname == '.js'"
+        },
+        {
+          "command": "oneClickRun.ExecutionScriptsInDebug",
+          "group": "0_cutcopypaste@3",
+          "when": "resourceExtname == '.js'"
+        },
+        {
           "command": "oneClickRun.runWithPlaywright",
           "group": "0_cutcopypaste@6",
-          "when": "resourceExtname == '.js' && workspace.hasPlaywright"
+          "when": "resourceFilename =~ /spec\\.js$/ && workspace.hasPlaywright"
+        },
+        {
+          "command": "oneClickRun.setHeadlessTrue",
+          "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == false && resourceExtname == '.js'",
+          "group": "0_cutcopypaste@7"
+        },
+        {
+          "command": "oneClickRun.setHeadlessFalse",
+          "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == true && resourceExtname == '.js'",
+          "group": "0_cutcopypaste@7"
         }
       ],
       "editor/context": [
         {
           "command": "oneClickRun.ExecutionScripts",
           "group": "0_cutcopypaste@2",
-          "when": "resourceExtname == 'js' || resourceExtname == 'ts'"
+          "when": "resourceExtname == '.js'"
         },
         {
           "command": "oneClickRun.ExecutionScriptsInDebug",
           "group": "0_cutcopypaste@3",
-          "when": "resourceExtname == 'js' || resourceExtname == 'ts'"
+          "when": "resourceExtname == '.js'"
         },
         {
           "command": "copyRelativePath.Workspace",
           "group": "0_cutcopypaste@1"
         },
         {
-          "command": "oneClickRun.allureServe",
-          "group": "0_cutcopypaste@2"
-        },
-        {
-          "command": "oneClickRun.allureGenerate",
-          "group": "0_cutcopypaste@3"
-        },
-        {
           "command": "oneClickRun.runWithPlaywright",
           "group": "0_cutcopypaste@6",
           "when": "resourceFilename =~ /\\.spec\\.js$/ && workspace.hasPlaywright"
+        },
+        {
+          "command": "oneClickRun.setHeadlessTrue",
+          "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == false && resourceExtname == '.js' && resourceExtname == '.js'",
+          "group": "0_cutcopypaste@7"
+        },
+        {
+          "command": "oneClickRun.setHeadlessFalse",
+          "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == true && resourceExtname == '.js' && resourceExtname == '.js'",
+          "group": "0_cutcopypaste@7"
+        },
+        {
+          "command": "oneClickRun.allureServe",
+          "group": "0_allure@2"
+        },
+        {
+          "command": "oneClickRun.allureGenerate",
+          "group": "0_allure@3"
         }
       ]
     },
@@ -161,6 +185,16 @@
         "command": "oneClickRun.runWithPlaywright",
         "key": "shift+alt+p",
         "when": "editorTextFocus"
+      },
+      {
+        "command": "oneClickRun.setHeadlessTrue",
+        "key": "shift+alt+b",
+        "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == false"
+      },
+      {
+        "command": "oneClickRun.setHeadlessFalse",
+        "key": "shift+alt+b",
+        "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == true"
       }
     ]
   },
