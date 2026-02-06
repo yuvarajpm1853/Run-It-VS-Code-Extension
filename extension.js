@@ -49,6 +49,15 @@ async function activate(context) {
 			openJsDebugTerminalWithCwd()
 		}
 	});
+	const runWithPlaywright = vscode.commands.registerCommand('oneClickRun.runWithPlaywright', function (arg1, arg2) {
+		let isPlaywright = checkPlaywright()
+		if (isPlaywright) {
+			let relativePath = getRelativePath(arg1, arg2)
+			runCmdInTerminal(`npx playwright test ${relativePath}`, "Playwright Terminal", false)
+			vscode.window.setStatusBarMessage(`✅ Running: ${relativePath}`, 3000);
+		}
+	});
+
 	const allureServe = vscode.commands.registerCommand('oneClickRun.allureServe', function (arg1, arg2) {
 		vscode.window.setStatusBarMessage('✅ Opening allure report', 3000);
 		runCmdInTerminal('allure serve ./allure-results', "Allure serve", false)
@@ -64,7 +73,7 @@ async function activate(context) {
 	let setHeadlessFalse = vscode.commands.registerCommand('oneClickRun.setHeadlessFalse', async function () {
 		await updateHeadlessValue()
 	})
-	const runWithPlaywright = vscode.commands.registerCommand('oneClickRun.runWithNode', function (arg1, arg2) {
+	const runWithNode = vscode.commands.registerCommand('oneClickRun.runWithNode', function (arg1, arg2) {
 		let isJSFile = checkFileExtension("js")
 		if (isJSFile) {
 			let relativePath = getRelativePath(arg1, arg2)
@@ -86,7 +95,8 @@ async function activate(context) {
 	context.subscriptions.push(runWithPlaywright);
 	context.subscriptions.push(setHeadlessTrue);
 	context.subscriptions.push(setHeadlessFalse);
-
+	context.subscriptions.push(runWithNode);
+	
 	await openJsDebugTerminal()
 	vscode.window.showInformationMessage('Run It Extension Activated');
 }
