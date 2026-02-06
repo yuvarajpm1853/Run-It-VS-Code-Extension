@@ -50,6 +50,10 @@
       {
         "command": "oneClickRun.setHeadlessFalse",
         "title": "Set headless to false"
+      },
+      {
+        "command": "oneClickRun.runWithNode",
+        "title": "Run with Node.js"
       }
     ],
     "menus": {
@@ -61,12 +65,12 @@
         {
           "command": "oneClickRun.ExecutionScripts",
           "group": "0_copypath@2",
-          "when": "resourceExtname == '.js'"
+          "when": "resourceExtname == '.js' || explorerResourceIsFolder"
         },
         {
           "command": "oneClickRun.ExecutionScriptsInDebug",
           "group": "0_copypath@3",
-          "when": "resourceExtname == '.js'"
+          "when": "resourceExtname == '.js' || explorerResourceIsFolder"
         },
         {
           "command": "oneClickRun.runWithPlaywright",
@@ -82,6 +86,11 @@
           "command": "oneClickRun.setHeadlessFalse",
           "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == true && resourceExtname == '.js'",
           "group": "0_copypath@7"
+        },
+        {
+          "command": "oneClickRun.runWithNode",
+          "when": "resourceExtname == '.js'",
+          "group": "0_copypath@8"
         }
       ],
       "editor/title/context": [
@@ -113,6 +122,11 @@
           "command": "oneClickRun.setHeadlessFalse",
           "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == true && resourceExtname == '.js'",
           "group": "0_cutcopypaste@7"
+        },
+        {
+          "command": "oneClickRun.runWithNode",
+          "when": "resourceExtname == '.js'",
+          "group": "0_cutcopypaste@8"
         }
       ],
       "editor/context": [
@@ -152,6 +166,11 @@
         {
           "command": "oneClickRun.allureGenerate",
           "group": "0_allure@3"
+        },
+        {
+          "command": "oneClickRun.runWithNode",
+          "when": "resourceExtname == '.js'",
+          "group": "0_cutcopypaste@8"
         }
       ]
     },
@@ -195,6 +214,11 @@
         "command": "oneClickRun.setHeadlessFalse",
         "key": "shift+alt+b",
         "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == true"
+      },
+      {
+        "command": "oneClickRun.runWithNode",
+        "key": "shift+alt+n",
+        "when": "resourceExtname == '.js'"
       }
     ]
   },

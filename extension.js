@@ -16,6 +16,8 @@ const lineDelimiter = isWindows ? '\r\n' : '\n';
  */
 async function activate(context) {
 
+	detectPlaywright();
+	updateHeadlessContext();
 	// vscode.window.onDidChangeActiveTerminal(checkActiveTerminal);
 
 	// The command has been defined in the package.json file
@@ -55,16 +57,6 @@ async function activate(context) {
 		vscode.window.setStatusBarMessage('✅ Generated allure report', 3000);
 		runCmdInTerminal('allure generate --single-file --clean')
 	});
-	const runWithPlaywright = vscode.commands.registerCommand('oneClickRun.runWithPlaywright', function (arg1, arg2) {
-		let isPlaywright = checkPlaywright()
-		if (isPlaywright) {
-			let relativePath = getRelativePath(arg1, arg2)
-			runCmdInTerminal(`npx playwright test ${relativePath}`, "Playwright Terminal", false)
-			vscode.window.setStatusBarMessage(`✅ Running: ${relativePath}`, 3000);
-		}
-	});
-
-	updateHeadlessContext();
 
 	let setHeadlessTrue = vscode.commands.registerCommand('oneClickRun.setHeadlessTrue', async function () {
 		await updateHeadlessValue()
@@ -72,6 +64,14 @@ async function activate(context) {
 	let setHeadlessFalse = vscode.commands.registerCommand('oneClickRun.setHeadlessFalse', async function () {
 		await updateHeadlessValue()
 	})
+	const runWithPlaywright = vscode.commands.registerCommand('oneClickRun.runWithNode', function (arg1, arg2) {
+		let isJSFile = checkFileExtension("js")
+		if (isJSFile) {
+			let relativePath = getRelativePath(arg1, arg2)
+			runCmdInTerminal(`node ${relativePath}`, "Node Terminal", false)
+			vscode.window.setStatusBarMessage(`✅ Running: ${relativePath}`, 3000);
+		}
+	});
 
 	vscode.workspace.onDidSaveTextDocument(doc => {
 		if (doc.fileName.endsWith('.env')) {
@@ -88,7 +88,6 @@ async function activate(context) {
 	context.subscriptions.push(setHeadlessFalse);
 
 	await openJsDebugTerminal()
-	detectPlaywright();
 	vscode.window.showInformationMessage('Run It Extension Activated');
 }
 
@@ -402,20 +401,9 @@ function resolveRelativeTestPath(relativePath) {
 }
 
 function checkPlaywright() {
-	const editor = vscode.window.activeTextEditor;
-	if (!editor) {
-		vscode.window.showWarningMessage('No active file');
-		return;
-	}
+	let isPlaywrightFile = checkFileExtension("spec.js")
 
-	const filePath = editor.document.uri.fsPath;
-	const fileName = path.basename(filePath);
-
-	// 1️⃣ Check spec.js
-	if (!fileName.endsWith('spec.js')) {
-		vscode.window.showInformationMessage('Not a spec.js file');
-		return;
-	}
+	if (!isPlaywrightFile) return;
 
 	// 2️⃣ Locate package.json
 	const workspaceFolders = vscode.workspace.workspaceFolders;
@@ -454,6 +442,24 @@ function checkPlaywright() {
 		vscode.window.showInformationMessage('Playwright not detected');
 		return;
 	}
+	return true
+}
+function checkFileExtension(ext) {
+	const editor = vscode.window.activeTextEditor;
+	if (!editor) {
+		vscode.window.showWarningMessage('No active file');
+		return;
+	}
+
+	const filePath = editor.document.uri.fsPath;
+	const fileName = path.basename(filePath);
+
+	// 1️⃣ Check spec.js
+	if (!fileName.endsWith(ext)) {
+		vscode.window.showInformationMessage(`Not a ${ext} file`);
+		return;
+	}
+
 	return true
 }
 function readHeadlessFromEnv() {

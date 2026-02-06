@@ -1,7 +1,7 @@
 # OneClickRun VS Code Extension
 
 ## Overview
-OneClickRun is a Visual Studio Code extension that provides options to run test scripts (.js) via executeScripts & Playwright, handles Allure report generation and serving, and allows copying relative paths.
+OneClickRun is a Visual Studio Code extension that streamlines running test scripts (.js) via executeScripts & Playwright, manages Allure report generation and serving, and enables quick copying of relative paths.
 
 ## Why?
 In day-to-day development and test automation, we often repeat the same manual steps just to run a script or test:
@@ -16,38 +16,29 @@ One Click Run replaces this entire workflow with a single UI command.
 With a right-click action, it automatically updates the .env file and triggers the required script execution, letting you focus on writing and debugging code instead of repeating setup steps.
 
 ## Features
-- Run test scripts using executionScripts.sh
-- Debug test scripts
-- Generate and serve Allure reports
-- Run tests with Playwright
-- Copy relative file paths
-- Context menu and editor integration
-- Keybindings for quick actions
-
-## Commands
-| Command | Description |
-| ------- | ----------- |
-| copyRelativePath.Workspace | Copy Relative Path (Workspace) |
-| run.ExecutionScripts | Run via executionScripts.sh |
-| run.ExecutionScriptsInDebug | Run via executionScripts.sh (Debug) |
-| run.allureServe | (Allure) Serve Report |
-| run.allureGenerate | (Allure) Generate Report |
-| run.runWithPlaywright | Run with Playwright |
+- Instantly run or debug test scripts using executionScripts.sh
+- Generate and serve Allure reports with one click
+- Run tests with Playwright (auto-detects Playwright in your workspace)
+- Copy relative file paths directly from the context menu
+- Context menu and editor integration for quick access
+- Customizable keybindings for all major actions
+- Conditional menu options (e.g., Playwright actions only appear for `spec.js` files and when Playwright is present)
+- Status messages for script execution and reporting
+- Keybindings/Shortcut Keys for quick actions
 
 ## Keybindings
-| Keybinding | Command |
-| ---------- | ------- |
-| Shift+Alt+X | run.ExecutionScripts |
-| Shift+Alt+D | run.ExecutionScriptsInDebug |
-| Shift+Alt+C | copyRelativePath.Workspace |
-| Shift+Alt+S | run.allureServe |
-| Shift+Alt+G | run.allureGenerate |
-| Shift+Alt+P | run.runWithPlaywright |
+| Keybinding | Action |
+| ---------- | ------ |
+| Shift+Alt+X | Run via executionScripts.sh |
+| Shift+Alt+D | Run via executionScripts.sh (Debug) |
+| Shift+Alt+C | Copy relative path |
+| Shift+Alt+S | Serve Allure report |
+| Shift+Alt+G | Generate Allure report |
+| Shift+Alt+P | Run with Playwright |
+| Shift+Alt+B | Set headless to true/false |
+| Shift+Alt+N | Run with Node.js |
 
-## Requirements
-- VS Code ^1.100.1
-
-## Images
+### Images
 
 ![1770049717628](image/README/1770049717628.png)
 
