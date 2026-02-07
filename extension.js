@@ -183,11 +183,8 @@ function runCmdInTerminal(cmd, terminalName = 'Execution Scripts', closeTerminal
 
 	terminal.show();
 
-	// For Windows Git Bash / WSL users:
-	if (isWindows) terminal.sendText(cmd);
-
-	// If you're sure it's executable on Linux/macOS:
-	else terminal.sendText(`./${cmd}`);
+	terminal.sendText(`./${cmd}`);
+	
 	if (closeTerminal) setTimeout(() => { terminal.dispose(); }, 1000); // 1 seconds
 }
 
