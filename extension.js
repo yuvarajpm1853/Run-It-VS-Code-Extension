@@ -46,7 +46,7 @@ async function activate(context) {
 		let { isUpdated, fileName } = updateEnvWithRelativePath(arg1, arg2)
 		if (isUpdated) {
 			vscode.window.setStatusBarMessage(`✅ (Debug) Running: ${fileName}`, 3000);
-			openJsDebugTerminalWithCwd()
+			openJsDebugTerminalWithCwd(`.\\executeScripts.sh`)
 		}
 	});
 	const runWithPlaywright = vscode.commands.registerCommand('oneClickRun.runWithPlaywright', function (arg1, arg2) {
@@ -81,23 +81,32 @@ async function activate(context) {
 			vscode.window.setStatusBarMessage(`✅ Running: ${relativePath}`, 3000);
 		}
 	});
-
-	vscode.workspace.onDidSaveTextDocument(doc => {
-		if (doc.fileName.endsWith('.env')) {
-			updateHeadlessContext();
+	const runWithNodeDebug = vscode.commands.registerCommand('oneClickRun.runWithNodeDebug', function (arg1, arg2) {
+		let isJSFile = checkFileExtension("js")
+		if (isJSFile) {
+			let relativePath = getRelativePath(arg1, arg2)
+			vscode.window.setStatusBarMessage(`✅ (Debug) Running: ${relativePath}`, 3000);
+			openJsDebugTerminalWithCwd(`node ${relativePath}`)
 		}
 	});
-	context.subscriptions.push(copyRelativePath);
-	context.subscriptions.push(ExecutionScripts);
-	context.subscriptions.push(ExecutionScriptsInDebug);
-	context.subscriptions.push(allureServe);
-	context.subscriptions.push(allureGenerate);
-	context.subscriptions.push(runWithPlaywright);
-	context.subscriptions.push(setHeadlessTrue);
-	context.subscriptions.push(setHeadlessFalse);
-	context.subscriptions.push(runWithNode);
-	await openJsDebugTerminal()
-	vscode.window.showInformationMessage('Run It Extension Activated');
+
+vscode.workspace.onDidSaveTextDocument(doc => {
+	if (doc.fileName.endsWith('.env')) {
+		updateHeadlessContext();
+	}
+});
+context.subscriptions.push(copyRelativePath);
+context.subscriptions.push(ExecutionScripts);
+context.subscriptions.push(ExecutionScriptsInDebug);
+context.subscriptions.push(allureServe);
+context.subscriptions.push(allureGenerate);
+context.subscriptions.push(runWithPlaywright);
+context.subscriptions.push(setHeadlessTrue);
+context.subscriptions.push(setHeadlessFalse);
+context.subscriptions.push(runWithNode);
+context.subscriptions.push(runWithNodeDebug);
+// await openJsDebugTerminal()
+// vscode.window.showInformationMessage('Run It Extension Activated');
 }
 
 function getRelativePath(arg1, arg2) {
@@ -187,7 +196,7 @@ function runCmdInTerminal(cmd, terminalName = 'Execution Scripts', closeTerminal
 	if (closeTerminal) setTimeout(() => { terminal.dispose(); }, 1000); // 1 seconds
 }
 
-async function openJsDebugTerminalWithCwd() {
+async function openJsDebugTerminalWithCwd(cmd) {
 
 	try {
 		await openJsDebugTerminal()
@@ -195,7 +204,7 @@ async function openJsDebugTerminalWithCwd() {
 		if (name !== "JavaScript Debug Terminal") await openJsDebugTerminal()
 
 		let terminal = vscode.window.activeTerminal;
-		terminal.sendText(`.\\executeScripts.sh`);
+		terminal.sendText(cmd);
 	} catch (error) {
 		console.log('[Debug Terminal] Failed to use official command:', error);
 	}
@@ -514,9 +523,7 @@ async function updateHeadlessValue(value) {
 	fs.writeFileSync(envPath, content);
 	await updateHeadlessContext();
 
-	vscode.window.setStatusBarMessage(
-		`✅ headless set to ${next}`
-	);
+	vscode.window.setStatusBarMessage(`✅ Headless set to ${next}`, 3000);
 }
 
 function deactivate() { }
