@@ -2,7 +2,7 @@
   "name": "OneClickRun",
   "displayName": "OneClickRun",
   "description": "A productivity-focused extension for running automation scripts with terminal & debug , including Playwright & Allure.",
-  "version": "3.4.0",
+  "version": "3.6.0",
   "publisher": "yuvarajpm1853",
   "engines": {
     "vscode": "^1.100.1"
@@ -13,7 +13,9 @@
     "Debuggers",
     "Other"
   ],
-  "activationEvents": ["*"],
+  "activationEvents": [
+    "*"
+  ],
   "main": "extension.js",
   "contributes": {
     "commands": [
@@ -39,15 +41,15 @@
       },
       {
         "command": "oneClickRun.runWithPlaywright",
-        "title": "Run with playwright"
+        "title": "Run with Playwright"
       },
       {
         "command": "oneClickRun.setHeadlessTrue",
-        "title": "Set headless to true"
+        "title": "Set Headless to true"
       },
       {
         "command": "oneClickRun.setHeadlessFalse",
-        "title": "Set headless to false"
+        "title": "Set Headless to false"
       },
       {
         "command": "oneClickRun.runWithNode",
@@ -56,6 +58,10 @@
       {
         "command": "oneClickRun.runWithNodeDebug",
         "title": "Run with Node.js (Debug)"
+      },
+      {
+        "command": "oneClickRun.closeAllGitBash",
+        "title": "Close All GitBash"
       }
     ],
     "menus": {
@@ -67,12 +73,12 @@
         {
           "command": "oneClickRun.ExecutionScripts",
           "group": "0_copypath@2",
-          "when": "resourceExtname == '.js' || explorerResourceIsFolder"
+          "when": "oneClickRun.hasExecuteScript"
         },
         {
           "command": "oneClickRun.ExecutionScriptsInDebug",
           "group": "0_copypath@3",
-          "when": "resourceExtname == '.js' || explorerResourceIsFolder"
+          "when": "resourceExtname == '.js' && oneClickRun.hasExecuteScript"
         },
         {
           "command": "oneClickRun.runWithPlaywright",
@@ -108,12 +114,12 @@
         {
           "command": "oneClickRun.ExecutionScripts",
           "group": "0_cutcopypaste@2",
-          "when": "resourceExtname == '.js'"
+          "when": "resourceExtname == '.js' && oneClickRun.hasExecuteScript"
         },
         {
           "command": "oneClickRun.ExecutionScriptsInDebug",
           "group": "0_cutcopypaste@3",
-          "when": "resourceExtname == '.js'"
+          "when": "resourceExtname == '.js' && oneClickRun.hasExecuteScript"
         },
         {
           "command": "oneClickRun.runWithPlaywright",
@@ -145,12 +151,12 @@
         {
           "command": "oneClickRun.ExecutionScripts",
           "group": "0_cutcopypaste@2",
-          "when": "resourceExtname == '.js'"
+          "when": "resourceExtname == '.js' && oneClickRun.hasExecuteScript"
         },
         {
           "command": "oneClickRun.ExecutionScriptsInDebug",
           "group": "0_cutcopypaste@3",
-          "when": "resourceExtname == '.js'"
+          "when": "resourceExtname == '.js' && oneClickRun.hasExecuteScript"
         },
         {
           "command": "copyRelativePath.Workspace",
@@ -178,6 +184,10 @@
         {
           "command": "oneClickRun.allureGenerate",
           "group": "0_allure@3"
+        },
+        {
+          "command": "oneClickRun.closeAllGitBash",
+          "group": "0_allure@4"
         },
         {
           "command": "oneClickRun.runWithNode",
@@ -224,12 +234,12 @@
       },
       {
         "command": "oneClickRun.setHeadlessTrue",
-        "key": "shift+alt+b",
+        "key": "shift+alt+h",
         "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == false"
       },
       {
         "command": "oneClickRun.setHeadlessFalse",
-        "key": "shift+alt+b",
+        "key": "shift+alt+h",
         "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == true"
       },
       {
@@ -239,7 +249,12 @@
       },
       {
         "command": "oneClickRun.runWithNodeDebug",
-        "key": "shift+alt+M",
+        "key": "shift+alt+m",
+        "when": "resourceExtname == '.js'"
+      },
+      {
+        "command": "oneClickRun.closeAllGitBash",
+        "key": "shift+alt+w",
         "when": "resourceExtname == '.js'"
       }
     ]
