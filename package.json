@@ -2,7 +2,7 @@
   "name": "OneClickRun",
   "displayName": "OneClickRun",
   "description": "A productivity-focused extension for running automation scripts with terminal & debug , including Playwright & Allure.",
-  "version": "3.6.0",
+  "version": "3.6.2",
   "publisher": "yuvarajpm1853",
   "engines": {
     "vscode": "^1.100.1"
@@ -24,12 +24,20 @@
         "title": "Copy Relative Path (Workspace)"
       },
       {
-        "command": "oneClickRun.ExecutionScripts",
-        "title": "Run via executionScripts.sh"
+        "command": "oneClickRun.ExecuteScripts",
+        "title": "Run via executeScripts.sh"
       },
       {
-        "command": "oneClickRun.ExecutionScriptsInDebug",
-        "title": "Run via executionScripts.sh (Debug)"
+        "command": "oneClickRun.ExecuteScriptsInDebug",
+        "title": "Run via executeScripts.sh (Debug)"
+      },
+      {
+        "command": "oneClickRun.RunExecuteScriptsDebug",
+        "title": "Trigger executeScripts.sh (Debug)"
+      },
+      {
+        "command": "oneClickRun.RunExecuteScripts",
+        "title": "Trigger executeScripts.sh"
       },
       {
         "command": "oneClickRun.allureServe",
@@ -68,147 +76,190 @@
       "explorer/context": [
         {
           "command": "copyRelativePath.Workspace",
-          "group": "0_copypath@1"
+          "group": "0_copypath1@1"
         },
         {
-          "command": "oneClickRun.ExecutionScripts",
-          "group": "0_copypath@2",
+          "command": "oneClickRun.ExecuteScripts",
+          "group": "0_copypath1@3",
           "when": "oneClickRun.hasExecuteScript"
         },
         {
-          "command": "oneClickRun.ExecutionScriptsInDebug",
-          "group": "0_copypath@3",
+          "command": "oneClickRun.RunExecuteScriptsDebug",
+          "group": "0_copypath3@2",
+          "when": "oneClickRun.hasExecuteScript"
+        },
+        {
+          "command": "oneClickRun.RunExecuteScripts",
+          "group": "0_copypath3@1",
+          "when": "oneClickRun.hasExecuteScript"
+        },
+        {
+          "command": "oneClickRun.ExecuteScriptsInDebug",
+          "group": "0_copypath1@4",
           "when": "resourceExtname == '.js' && oneClickRun.hasExecuteScript"
         },
         {
           "command": "oneClickRun.runWithPlaywright",
-          "group": "0_copypath@6",
+          "group": "0_copypath2@1",
           "when": "resourceFilename =~ /spec\\.js$/ && workspace.hasPlaywright"
         },
         {
           "command": "oneClickRun.setHeadlessTrue",
           "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == false",
-          "group": "0_copypath@7"
+          "group": "0_copypath1@2"
         },
         {
           "command": "oneClickRun.setHeadlessFalse",
           "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == true",
-          "group": "0_copypath@7"
+          "group": "0_copypath1@2"
         },
         {
           "command": "oneClickRun.runWithNode",
           "when": "resourceExtname == '.js'",
-          "group": "0_copypath@8"
+          "group": "0_copypath2@2"
         },
         {
           "command": "oneClickRun.runWithNodeDebug",
           "when": "resourceExtname == '.js'",
-          "group": "0_copypath@9"
+          "group": "0_copypath2@3"
         }
       ],
       "editor/title/context": [
         {
           "command": "copyRelativePath.Workspace",
-          "group": "0_cutcopypaste@1"
+          "group": "0_copypath1@1"
         },
         {
-          "command": "oneClickRun.ExecutionScripts",
-          "group": "0_cutcopypaste@2",
+          "command": "oneClickRun.ExecuteScripts",
+          "group": "0_copypath1@3",
           "when": "resourceExtname == '.js' && oneClickRun.hasExecuteScript"
         },
         {
-          "command": "oneClickRun.ExecutionScriptsInDebug",
-          "group": "0_cutcopypaste@3",
+          "command": "oneClickRun.ExecuteScriptsInDebug",
+          "group": "0_copypath1@4",
           "when": "resourceExtname == '.js' && oneClickRun.hasExecuteScript"
+        },
+        {
+          "command": "oneClickRun.RunExecuteScripts",
+          "group": "0_copypath3@1",
+          "when": "oneClickRun.hasExecuteScript"
+        },
+        {
+          "command": "oneClickRun.RunExecuteScriptsDebug",
+          "group": "0_copypath3@2",
+          "when": "oneClickRun.hasExecuteScript"
         },
         {
           "command": "oneClickRun.runWithPlaywright",
-          "group": "0_cutcopypaste@6",
+          "group": "0_copypath2@1",
           "when": "resourceFilename =~ /spec\\.js$/ && workspace.hasPlaywright"
         },
         {
           "command": "oneClickRun.setHeadlessTrue",
           "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == false",
-          "group": "0_cutcopypaste@7"
+          "group": "0_copypath1@2"
         },
         {
           "command": "oneClickRun.setHeadlessFalse",
           "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == true",
-          "group": "0_cutcopypaste@7"
+          "group": "0_copypath1@2"
         },
         {
           "command": "oneClickRun.runWithNode",
           "when": "resourceExtname == '.js'",
-          "group": "0_cutcopypaste@8"
+          "group": "0_copypath2@2"
         },
         {
           "command": "oneClickRun.runWithNodeDebug",
           "when": "resourceExtname == '.js'",
-          "group": "0_cutcopypaste@9"
+          "group": "0_copypath2@3"
         }
       ],
       "editor/context": [
+                {
+          "command": "oneClickRun.RunExecuteScripts",
+          "group": "0_copypath3@1",
+          "when": "oneClickRun.hasExecuteScript"
+        },
         {
-          "command": "oneClickRun.ExecutionScripts",
-          "group": "0_cutcopypaste@2",
+          "command": "oneClickRun.RunExecuteScriptsDebug",
+          "group": "0_copypath3@2",
+          "when": "oneClickRun.hasExecuteScript"
+        },
+        {
+          "command": "oneClickRun.ExecuteScripts",
+          "group": "0_copypath1@3",
           "when": "resourceExtname == '.js' && oneClickRun.hasExecuteScript"
         },
         {
-          "command": "oneClickRun.ExecutionScriptsInDebug",
-          "group": "0_cutcopypaste@3",
+          "command": "oneClickRun.ExecuteScriptsInDebug",
+          "group": "0_copypath1@4",
           "when": "resourceExtname == '.js' && oneClickRun.hasExecuteScript"
         },
         {
           "command": "copyRelativePath.Workspace",
-          "group": "0_cutcopypaste@1"
+          "group": "0_copypath1@1"
         },
         {
           "command": "oneClickRun.runWithPlaywright",
-          "group": "0_cutcopypaste@6",
+          "group": "0_copypath2@1",
           "when": "resourceFilename =~ /\\.spec\\.js$/ && workspace.hasPlaywright"
         },
         {
           "command": "oneClickRun.setHeadlessTrue",
           "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == false",
-          "group": "0_cutcopypaste@7"
+          "group": "0_copypath1@2"
         },
         {
           "command": "oneClickRun.setHeadlessFalse",
           "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == true",
-          "group": "0_cutcopypaste@7"
+          "group": "0_copypath1@2"
         },
         {
           "command": "oneClickRun.allureServe",
-          "group": "0_allure@2"
+          "group": "0_copypath@1",
+          "when": "oneClickRun.hasAllureResults"
         },
         {
           "command": "oneClickRun.allureGenerate",
-          "group": "0_allure@3"
+          "group": "0_copypath@2",
+          "when": "oneClickRun.hasAllureResults"
         },
         {
           "command": "oneClickRun.closeAllGitBash",
-          "group": "0_allure@4"
+          "group": "0_copypath@3",
+          "when": "oneClickRun.gitBashRunning"
         },
         {
           "command": "oneClickRun.runWithNode",
           "when": "resourceExtname == '.js'",
-          "group": "0_cutcopypaste@8"
+          "group": "0_copypath2@2"
         },
         {
           "command": "oneClickRun.runWithNodeDebug",
           "when": "resourceExtname == '.js'",
-          "group": "0_cutcopypaste@9"
+          "group": "0_copypath2@3"
         }
       ]
     },
     "keybindings": [
       {
-        "command": "oneClickRun.ExecutionScripts",
+        "command": "oneClickRun.RunExecuteScripts",
+        "key": "shift+alt+t",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "oneClickRun.RunExecuteScriptsDebug",
+        "key": "shift+alt+y",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "oneClickRun.ExecuteScripts",
         "key": "shift+alt+x",
         "when": "editorTextFocus"
       },
       {
-        "command": "oneClickRun.ExecutionScriptsInDebug",
+        "command": "oneClickRun.ExecuteScriptsInDebug",
         "key": "shift+alt+d",
         "when": "editorTextFocus"
       },
@@ -255,7 +306,7 @@
       {
         "command": "oneClickRun.closeAllGitBash",
         "key": "shift+alt+w",
-        "when": "resourceExtname == '.js'"
+        "when": "editorTextFocus"
       }
     ]
   },

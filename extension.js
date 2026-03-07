@@ -1,16 +1,16 @@
 // @ts-nocheck
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-const vscode = require('vscode');
-const fs = require('fs');
-const path = require('path');
-const { exec } = require('child_process');
-const util = require('util');
+const vscode = require("vscode");
+const fs = require("fs");
+const path = require("path");
+const { exec } = require("child_process");
+const util = require("util");
 
 const execAsync = util.promisify(exec);
-const isWindows = process.platform === 'win32';
-const lineDelimiter = isWindows ? '\r\n' : '\n';
-const officialJsDebugCommand = 'extension.js-debug.createDebuggerTerminal';
+const isWindows = process.platform === "win32";
+const lineDelimiter = isWindows ? "\r\n" : "\n";
+const officialJsDebugCommand = "extension.js-debug.createDebuggerTerminal";
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 
@@ -18,297 +18,394 @@ const officialJsDebugCommand = 'extension.js-debug.createDebuggerTerminal';
  * @param {vscode.ExtensionContext} context
  */
 async function activate(context) {
-	activateJSDebugger()
-	detectPlaywright();
-	updateHeadlessContext();
-	updateExecuteScriptContext()
+  activateJSDebugger();
+  detectPlaywright();
+  updateHeadlessContext();
+  updateExecuteScriptContext();
 
-	vscode.window.onDidChangeActiveTerminal(checkActiveTerminal);
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with  registerCommand
-	// The commandId parameter must match the command field in package.json
+  vscode.window.onDidChangeActiveTerminal(checkActiveTerminal);
+  // The command has been defined in the package.json file
+  // Now provide the implementation of the command with  registerCommand
+  // The commandId parameter must match the command field in package.json
 
-	const copyRelativePath = vscode.commands.registerCommand('copyRelativePath.Workspace', async function (arg1, arg2) {
-		// The code you place here will be executed every time your command is executed
+  const copyRelativePath = vscode.commands.registerCommand(
+    "copyRelativePath.Workspace",
+    async function (arg1, arg2) {
+      // The code you place here will be executed every time your command is executed
 
-		// Display a message box to the user
-		// vscode.window.showInformationMessage('Copied Relative Path');
+      // Display a message box to the user
+      // vscode.window.showInformationMessage('Copied Relative Path');
 
-		let relativePath = getRelativePath(arg1, arg2)
-		if (relativePath) vscode.env.clipboard.writeText(relativePath);
-		vscode.window.setStatusBarMessage('✅ Copied Relative Path', 3000);
-	});
+      let relativePath = getRelativePath(arg1, arg2);
+      if (relativePath) vscode.env.clipboard.writeText(relativePath);
+      vscode.window.setStatusBarMessage("✅ Copied Relative Path", 3000);
+    }
+  );
 
-	const ExecutionScripts = vscode.commands.registerCommand('oneClickRun.ExecutionScripts', async function (arg1, arg2) {
-		let { isUpdated, fileName } = updateEnvWithRelativePath(arg1, arg2)
-		if (isUpdated) {
-			await runCmdInTerminal('.\\executeScripts.sh')
-			vscode.window.setStatusBarMessage(`✅ Running: ${fileName}`, 3000);
-			// await updateGitBashContext();
-		}
-	});
-	const ExecutionScriptsInDebug = vscode.commands.registerCommand('oneClickRun.ExecutionScriptsInDebug', async function (arg1, arg2) {
-		let { isUpdated, fileName } = updateEnvWithRelativePath(arg1, arg2)
-		if (isUpdated) {
-			await openJsDebugTerminalWithCwd(`.\\executeScripts.sh`)
-			vscode.window.setStatusBarMessage(`✅ (Debug) Running: ${fileName}`, 3000);
-			// await updateGitBashContext();
-		}
-	});
-	const runWithPlaywright = vscode.commands.registerCommand('oneClickRun.runWithPlaywright', async function (arg1, arg2) {
-		let isPlaywright = checkPlaywright()
-		if (isPlaywright) {
-			let relativePath = getRelativePath(arg1, arg2)
-			await runCmdInTerminal(`npx playwright test ${relativePath}`, "Playwright Terminal", false)
-			vscode.window.setStatusBarMessage(`✅ Running: ${relativePath}`, 3000);
-		}
-	});
+  const runExecutionScriptsDebug = vscode.commands.registerCommand(
+    "oneClickRun.RunExecuteScriptsDebug",
+    async function () {
+      let fileName = getTestName();
+      await openJsDebugTerminalWithCwd(`.\\executeScripts.sh`);
+      vscode.window.setStatusBarMessage(
+        `✅ (Debug) Running: ${fileName}.sh`,
+        3000
+      );
+    }
+  );
 
-	const allureServe = vscode.commands.registerCommand('oneClickRun.allureServe', async function (arg1, arg2) {
-		await runCmdInTerminal('allure serve allure-results', "Allure serve", false)
-		vscode.window.setStatusBarMessage('✅ Opening allure report', 3000);
-	});
-	const allureGenerate = vscode.commands.registerCommand('oneClickRun.allureGenerate', async function (arg1, arg2) {
-		await runCmdInTerminal('allure generate --single-file --clean', "Allure generate")
-		vscode.window.setStatusBarMessage('✅ Generated allure report', 3000);
-	});
+  const runExecutionScripts = vscode.commands.registerCommand(
+    "oneClickRun.RunExecuteScripts",
+    async function () {
+      let fileName = getTestName();
+        await runCmdInTerminal(".\\executeScripts.sh");
+        vscode.window.setStatusBarMessage(`✅ Running: ${fileName}`, 3000);
+      }
+  );
 
-	let setHeadlessTrue = vscode.commands.registerCommand('oneClickRun.setHeadlessTrue', async function () {
-		await updateHeadlessValue()
-	})
-	let setHeadlessFalse = vscode.commands.registerCommand('oneClickRun.setHeadlessFalse', async function () {
-		await updateHeadlessValue()
-	})
-	const runWithNode = vscode.commands.registerCommand('oneClickRun.runWithNode', async function (arg1, arg2) {
-		let isJSFile = checkFileExtension("js")
-		if (isJSFile) {
-			3
-			let relativePath = getRelativePath(arg1, arg2)
-			await runCmdInTerminal(`node ${relativePath}`, "Node Terminal", false)
-			vscode.window.setStatusBarMessage(`✅ Running: ${relativePath}`, 3000);
-		}
-	});
-	const runWithNodeDebug = vscode.commands.registerCommand('oneClickRun.runWithNodeDebug', async function (arg1, arg2) {
-		let isJSFile = checkFileExtension("js")
-		if (isJSFile) {
-			let relativePath = getRelativePath(arg1, arg2)
-			await openJsDebugTerminalWithCwd(`node ${relativePath}`)
-			vscode.window.setStatusBarMessage(`✅ (Debug) Running: ${relativePath}`, 3000);
-		}
-	});
-	const closeAllGitBash = vscode.commands.registerCommand('oneClickRun.closeAllGitBash', async function (arg1, arg2) {
-		await execAsync('taskkill /IM mintty.exe /F');
-		// vscode.commands.executeCommand('setContext', 'oneClickRun.gitBashRunning', true);
-		// await updateGitBashContext();
-		vscode.window.setStatusBarMessage(`✅ (Debug) Running: ${relativePath}`, 3000);
-	});
+  const ExecutionScripts = vscode.commands.registerCommand(
+    "oneClickRun.ExecuteScripts",
+    async function (arg1, arg2) {
+      let { isUpdated, fileName } = updateEnvWithRelativePath(arg1, arg2);
+      if (isUpdated) {
+        await runCmdInTerminal(".\\executeScripts.sh");
+        vscode.window.setStatusBarMessage(`✅ Running: ${fileName}`, 3000);
+        // await updateGitBashContext();
+      }
+    }
+  );
+  const ExecutionScriptsInDebug = vscode.commands.registerCommand(
+    "oneClickRun.ExecuteScriptsInDebug",
+    async function (arg1, arg2) {
+      let { isUpdated, fileName } = updateEnvWithRelativePath(arg1, arg2);
+      if (isUpdated) {
+        await openJsDebugTerminalWithCwd(`.\\executeScripts.sh`);
+        vscode.window.setStatusBarMessage(
+          `✅ (Debug) Running: ${fileName}`,
+          3000
+        );
+        // await updateGitBashContext();
+      }
+    }
+  );
+  const runWithPlaywright = vscode.commands.registerCommand(
+    "oneClickRun.runWithPlaywright",
+    async function (arg1, arg2) {
+      let isPlaywright = checkPlaywright();
+      if (isPlaywright) {
+        let relativePath = getRelativePath(arg1, arg2);
+        await runCmdInTerminal(
+          `npx playwright test ${relativePath}`,
+          "Playwright Terminal",
+          false
+        );
+        vscode.window.setStatusBarMessage(`✅ Running: ${relativePath}`, 3000);
+      }
+    }
+  );
 
-	vscode.workspace.onDidSaveTextDocument(doc => {
-		if (doc.fileName.endsWith('.env')) {
-			updateHeadlessContext();
-		}
-	});
-	context.subscriptions.push(copyRelativePath);
-	context.subscriptions.push(ExecutionScripts);
-	context.subscriptions.push(ExecutionScriptsInDebug);
-	context.subscriptions.push(allureServe);
-	context.subscriptions.push(allureGenerate);
-	context.subscriptions.push(runWithPlaywright);
-	context.subscriptions.push(setHeadlessTrue);
-	context.subscriptions.push(setHeadlessFalse);
-	context.subscriptions.push(runWithNode);
-	context.subscriptions.push(runWithNodeDebug);
-	context.subscriptions.push(closeAllGitBash);
+  const allureServe = vscode.commands.registerCommand(
+    "oneClickRun.allureServe",
+    async function () {
+      await runCmdInTerminal(
+        "allure serve allure-results",
+        "Allure serve",
+        false
+      );
+      vscode.window.setStatusBarMessage("✅ Opening allure report", 3000);
+    }
+  );
+  const allureGenerate = vscode.commands.registerCommand(
+    "oneClickRun.allureGenerate",
+    async function () {
+      await runCmdInTerminal(
+        "allure generate --single-file --clean",
+        "Allure generate"
+      );
+      vscode.window.setStatusBarMessage("✅ Generated allure report", 3000);
+    }
+  );
 
-	// await updateGitBashContext();
-	// setInterval(updateGitBashContext, 3000);
-	// vscode.window.showInformationMessage('OneClickRun Extension Activated');
+  let setHeadlessTrue = vscode.commands.registerCommand(
+    "oneClickRun.setHeadlessTrue",
+    async function () {
+      await updateHeadlessValue();
+    }
+  );
+  let setHeadlessFalse = vscode.commands.registerCommand(
+    "oneClickRun.setHeadlessFalse",
+    async function () {
+      await updateHeadlessValue();
+    }
+  );
+  const runWithNode = vscode.commands.registerCommand(
+    "oneClickRun.runWithNode",
+    async function (arg1, arg2) {
+      let isJSFile = checkFileExtension("js");
+      if (isJSFile) {
+        3;
+        let relativePath = getRelativePath(arg1, arg2);
+        await runCmdInTerminal(`node ${relativePath}`, "Node Terminal", false);
+        vscode.window.setStatusBarMessage(`✅ Running: ${relativePath}`, 3000);
+      }
+    }
+  );
+  const runWithNodeDebug = vscode.commands.registerCommand(
+    "oneClickRun.runWithNodeDebug",
+    async function (arg1, arg2) {
+      let isJSFile = checkFileExtension("js");
+      if (isJSFile) {
+        let relativePath = getRelativePath(arg1, arg2);
+        await openJsDebugTerminalWithCwd(`node ${relativePath}`);
+        vscode.window.setStatusBarMessage(
+          `✅ (Debug) Running: ${relativePath}`,
+          3000
+        );
+      }
+    }
+  );
+  const closeAllGitBash = vscode.commands.registerCommand(
+    "oneClickRun.closeAllGitBash",
+    async function () {
+      try {
+        await execAsync("tasklist | findstr mintty.exe");
+
+        // If above succeeds → process exists
+        await execAsync("taskkill /IM mintty.exe /F");
+
+        vscode.window.setStatusBarMessage(`✅ Closed All GitBash`, 3000);
+      } catch {
+        // Process not found → silently ignore
+        vscode.window.setStatusBarMessage(`ℹ️ No GitBash running`, 3000);
+      }
+      // vscode.commands.executeCommand('setContext', 'oneClickRun.gitBashRunning', true);
+      // await updateGitBashContext();
+    }
+  );
+
+  vscode.workspace.onDidSaveTextDocument((doc) => {
+    if (doc.fileName.endsWith(".env")) {
+      updateHeadlessContext();
+    }
+  });
+  context.subscriptions.push(copyRelativePath);
+  context.subscriptions.push(runExecutionScriptsDebug);
+  context.subscriptions.push(runExecutionScripts);
+  context.subscriptions.push(ExecutionScripts);
+  context.subscriptions.push(ExecutionScriptsInDebug);
+  context.subscriptions.push(allureServe);
+  context.subscriptions.push(allureGenerate);
+  context.subscriptions.push(runWithPlaywright);
+  context.subscriptions.push(setHeadlessTrue);
+  context.subscriptions.push(setHeadlessFalse);
+  context.subscriptions.push(runWithNode);
+  context.subscriptions.push(runWithNodeDebug);
+  context.subscriptions.push(closeAllGitBash);
+
+  // await updateGitBashContext();
+  setInterval(updateGitBashContext, 3000);
+  setInterval(updateAllureContext, 3000);
+  // vscode.window.showInformationMessage('OneClickRun Extension Activated');
 }
 
 function getRelativePath(arg1, arg2) {
-	let resources;
-	if (Array.isArray(arg2)) {
-		resources = arg2;
-	} else if (arg1) {
-		resources = [arg1];
-	} else {
-		if (vscode.window.activeTextEditor && vscode.window.activeTextEditor.document.uri) {
-			resources = [vscode.window.activeTextEditor.document.uri];
-		}
-	}
+  let resources;
+  if (Array.isArray(arg2)) {
+    resources = arg2;
+  } else if (arg1) {
+    resources = [arg1];
+  } else {
+    if (
+      vscode.window.activeTextEditor &&
+      vscode.window.activeTextEditor.document.uri
+    ) {
+      resources = [vscode.window.activeTextEditor.document.uri];
+    }
+  }
 
-	if (resources) {
-		const relativePaths = [];
-		for (const resource of resources) {
-			const relativePath = vscode.workspace.asRelativePath(resource, false);
-			if (relativePath) {
-				relativePaths.push(isWindows ? relativePath.replace(/\\/g, '/') : relativePath);
-			}
-		}
-		return relativePaths.join(lineDelimiter);
-	}
-	else return undefined
+  if (resources) {
+    const relativePaths = [];
+    for (const resource of resources) {
+      const relativePath = vscode.workspace.asRelativePath(resource, false);
+      if (relativePath) {
+        relativePaths.push(
+          isWindows ? relativePath.replace(/\\/g, "/") : relativePath
+        );
+      }
+    }
+    return relativePaths.join(lineDelimiter);
+  } else return undefined;
 }
 
 function updateEnvFile(testPath) {
+  const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+  const envPath = path.join(workspaceRoot, ".env");
 
-	const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-	const envPath = path.join(workspaceRoot, '.env');
+  let originalContent = "";
 
-	let originalContent = '';
+  if (fs.existsSync(envPath)) {
+    originalContent = fs.readFileSync(envPath, "utf8");
+  }
 
-	if (fs.existsSync(envPath)) {
-		originalContent = fs.readFileSync(envPath, 'utf8');
-	}
+  let updatedContent = originalContent;
 
-	let updatedContent = originalContent;
+  const testNameRegex = /^TESTNAME=.*$/m;
 
-	const testNameRegex = /^TESTNAME=.*$/m;
+  if (testNameRegex.test(originalContent)) {
+    // Replace existing TESTNAME line
+    updatedContent = originalContent.replace(
+      testNameRegex,
+      `TESTNAME=${testPath}`
+    );
+  } else {
+    // Append safely (preserve formatting)
+    updatedContent = originalContent.trimEnd() + `\nTESTNAME=${testPath}\n`;
+  }
 
-	if (testNameRegex.test(originalContent)) {
-		// Replace existing TESTNAME line
-		updatedContent = originalContent.replace(
-			testNameRegex,
-			`TESTNAME=${testPath}`
-		);
-	} else {
-		// Append safely (preserve formatting)
-		updatedContent =
-			originalContent.trimEnd() +
-			`\nTESTNAME=${testPath}\n`;
-	}
+  // 🔎 Validation: ensure nothing else changed
+  const originalWithoutTestName = originalContent
+    .replace(testNameRegex, "")
+    .trim();
+  const updatedWithoutTestName = updatedContent
+    .replace(/^TESTNAME=.*$/m, "")
+    .trim();
 
-	// 🔎 Validation: ensure nothing else changed
-	const originalWithoutTestName = originalContent.replace(testNameRegex, '').trim();
-	const updatedWithoutTestName = updatedContent.replace(/^TESTNAME=.*$/m, '').trim();
-
-	if (originalWithoutTestName !== updatedWithoutTestName) {
-		throw new Error('Unexpected modification detected in .env file');
-	}
-	else fs.writeFileSync(envPath, updatedContent, 'utf8');
-	return true;
+  if (originalWithoutTestName !== updatedWithoutTestName) {
+    throw new Error("Unexpected modification detected in .env file");
+  } else fs.writeFileSync(envPath, updatedContent, "utf8");
+  return true;
 }
 
 function updateEnvWithRelativePath(arg1, arg2) {
-	let relativePath = getRelativePath(arg1, arg2)
+  let relativePath = getRelativePath(arg1, arg2);
 
-	// checking isDirectory
-	relativePath = resolveRelativeTestPath(relativePath)
+  // checking isDirectory
+  // relativePath = resolveRelativeTestPath(relativePath);
 
-	let isUpdated = updateEnvFile(relativePath)
-	const fileName = path.basename(relativePath);
+  let isUpdated = updateEnvFile(relativePath);
+  const fileName = path.basename(relativePath);
 
-	return { isUpdated, relativePath, fileName }
+  return { isUpdated, relativePath, fileName };
 }
 
-async function runCmdInTerminal(cmd, terminalName = 'Execution Scripts', closeTerminal = true) {
+async function runCmdInTerminal(
+  cmd,
+  terminalName = "Execution Scripts",
+  closeTerminal = true
+) {
+  const name = vscode.window.activeTerminal?.name;
+  let terminal;
 
-	const name = vscode.window.activeTerminal?.name;
-	let terminal;
+  if (name !== terminalName) {
+    terminal = vscode.window.createTerminal(terminalName);
+  } else terminal = vscode.window.activeTerminal;
 
-	if (name !== terminalName) {
-		terminal = vscode.window.createTerminal(terminalName);
-	} else terminal = vscode.window.activeTerminal;
+  await terminal.show(true);
 
-	await terminal.show(true);
+  await terminal.sendText(cmd);
 
-	await terminal.sendText(cmd);
-
-	if (closeTerminal) await setTimeout(() => { terminal.dispose(); }, 15000);
+  if (closeTerminal)
+    await setTimeout(() => {
+      terminal.dispose();
+    }, 15000);
 }
 
 async function openJsDebugTerminalWithCwd(cmd) {
+  try {
+    await openJsDebugTerminal();
+    const name = await vscode.window.activeTerminal?.name;
+    if (name !== "JavaScript Debug Terminal") await openJsDebugTerminal();
 
-	try {
-		await openJsDebugTerminal()
-		const name = await vscode.window.activeTerminal?.name;
-		if (name !== "JavaScript Debug Terminal") await openJsDebugTerminal()
-
-		let terminal = vscode.window.activeTerminal;
-		terminal.sendText(cmd);
-	} catch (error) {
-		console.log('[Debug Terminal] Failed to use official command:', error);
-	}
+    let terminal = vscode.window.activeTerminal;
+    terminal.sendText(cmd);
+  } catch (error) {
+    console.log("[Debug Terminal] Failed to use official command:", error);
+  }
 }
 async function openJsDebugTerminal() {
-	try {
-		let res = await activateJSDebugger()
-		const name = await vscode.window.activeTerminal?.name;
+  try {
+    let res = await activateJSDebugger();
+    const name = await vscode.window.activeTerminal?.name;
 
-		if (res && name !== "JavaScript Debug Terminal") {
+    if (res && name !== "JavaScript Debug Terminal") {
+      // Execute the command with the current working directory
+      const cwdUri = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      // await vscode.commands.executeCommand(officialJsDebugCommand);
 
-			// Execute the command with the current working directory
-			const cwdUri = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-			// await vscode.commands.executeCommand(officialJsDebugCommand);
-
-			await vscode.commands.executeCommand(officialJsDebugCommand, {
-				cwd: cwdUri ?? undefined
-			});
-
-		}
-	} catch (error) {
-		console.log('[Debug Terminal] Failed :', error);
-	}
+      await vscode.commands.executeCommand(officialJsDebugCommand, {
+        cwd: cwdUri ?? undefined,
+      });
+    }
+  } catch (error) {
+    console.log("[Debug Terminal] Failed :", error);
+  }
 }
 function checkActiveTerminal() {
-	const { activeTerminal } = vscode.window;
-	console.log("activeTerminal: " + (activeTerminal ? activeTerminal.name : "<none>"));
+  const { activeTerminal } = vscode.window;
+  console.log(
+    "activeTerminal: " + (activeTerminal ? activeTerminal.name : "<none>")
+  );
 }
 async function activateJSDebugger() {
-	// The official comman	d provided by VS Code's built-in JavaScript Debugger
-	try {
-		// Pre-step: Ensure JavaScript Debugger extension is activated
-		// This is crucial because the extension is lazy-loaded and may not be available initially
+  // The official comman	d provided by VS Code's built-in JavaScript Debugger
+  try {
+    // Pre-step: Ensure JavaScript Debugger extension is activated
+    // This is crucial because the extension is lazy-loaded and may not be available initially
 
-		const jsDebugExtension = vscode.extensions.getExtension('ms-vscode.js-debug');
-		if (jsDebugExtension && !jsDebugExtension.isActive) {
-			console.log('[Debug Terminal] Activating JavaScript Debugger extension directly...');
-			await jsDebugExtension.activate();
+    const jsDebugExtension =
+      vscode.extensions.getExtension("ms-vscode.js-debug");
+    if (jsDebugExtension && !jsDebugExtension.isActive) {
+      console.log(
+        "[Debug Terminal] Activating JavaScript Debugger extension directly..."
+      );
+      await jsDebugExtension.activate();
 
-			// Give it a moment to fully initialize
-			await new Promise(resolve => setTimeout(resolve, 5000));
-		}
+      // Give it a moment to fully initialize
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    }
 
-		console.log('[Debug Terminal] Attempting to use official JS Debug command...');
+    console.log(
+      "[Debug Terminal] Attempting to use official JS Debug command..."
+    );
 
-		// Strategy 1: Try to use the official JS Debug command
-		// This is the most reliable method when available
+    // Strategy 1: Try to use the official JS Debug command
+    // This is the most reliable method when available
 
-		// Get all available commands to check if the JS Debug command exists
-		const availableCommands = await vscode.commands.getCommands(true);
+    // Get all available commands to check if the JS Debug command exists
+    const availableCommands = await vscode.commands.getCommands(true);
 
-		if (availableCommands.includes(officialJsDebugCommand)) {
-			console.log('[Debug Terminal] Official JS Debug command found, using it...');
-			return true
-		} else {
-			console.log('[Debug Terminal] Official JS Debug command not available');
-		}
-
-	} catch (error) {
-		console.log('[Debug Terminal] Failed to use official command:', error);
-	}
+    if (availableCommands.includes(officialJsDebugCommand)) {
+      console.log(
+        "[Debug Terminal] Official JS Debug command found, using it..."
+      );
+      return true;
+    } else {
+      console.log("[Debug Terminal] Official JS Debug command not available");
+    }
+  } catch (error) {
+    console.log("[Debug Terminal] Failed to use official command:", error);
+  }
 }
 async function detectPlaywright() {
-	const folders = vscode.workspace.workspaceFolders;
-	if (!folders) return;
+  const folders = vscode.workspace.workspaceFolders;
+  if (!folders) return;
 
-	const pkgPath = path.join(folders[0].uri.fsPath, 'package.json');
-	if (!fs.existsSync(pkgPath)) return;
+  const pkgPath = path.join(folders[0].uri.fsPath, "package.json");
+  if (!fs.existsSync(pkgPath)) return;
 
-	const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-	const deps = {
-		...pkg.dependencies,
-		...pkg.devDependencies
-	};
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
+  const deps = {
+    ...pkg.dependencies,
+    ...pkg.devDependencies,
+  };
 
-	const hasPlaywright =
-		deps?.['@playwright/test'] || deps?.['playwright'];
+  const hasPlaywright = deps?.["@playwright/test"] || deps?.["playwright"];
 
-	await vscode.commands.executeCommand(
-		'setContext',
-		'workspace.hasPlaywright',
-		!!hasPlaywright
-	);
+  await vscode.commands.executeCommand(
+    "setContext",
+    "workspace.hasPlaywright",
+    !!hasPlaywright
+  );
 }
 // function runExecInDebug(filePath, isDebug = false) {
 
@@ -330,189 +427,231 @@ async function detectPlaywright() {
 // 	// terminal.sendText('executionScripts.sh');
 // }
 
-function resolveRelativeTestPath(relativePath) {
-	const workspace = vscode.workspace.workspaceFolders?.[0];
-	const absolutePath = path.join(workspace.uri.fsPath, relativePath);
-	const stat = fs.statSync(absolutePath);
+// function resolveRelativeTestPath(relativePath) {
+//   const workspace = vscode.workspace.workspaceFolders?.[0];
+//   const absolutePath = path.join(workspace.uri.fsPath, relativePath);
+//   const stat = fs.statSync(absolutePath);
 
-	// // ✅ File → use directly
-	// if (stat.isFile()) {
-	// 	return relativePath.replace(/\\/g, '/');
-	// }
+//   // ✅ File → use directly
+//   if (stat.isFile()) {
+//   	return relativePath.replace(/\\/g, '/');
+//   }
 
-	// // 📁 Directory → convert to glob
-	// if (stat.isDirectory()) {
-	// 	return path
-	// 		.join(relativePath.replace(/\/$/, ''), '**/*.js')
-	// 		.replace(/\\/g, '/');
-	// }
-	return relativePath.replace(/\\/g, '/');
-
-}
+//   // 📁 Directory → convert to glob
+//   if (stat.isDirectory()) {
+//   	return path
+//   		.join(relativePath.replace(/\/$/, ''), '**/*.js')
+//   		.replace(/\\/g, '/');
+//   }
+//   return relativePath.replace(/\\/g, "/");
+// }
 
 function checkPlaywright() {
-	let isPlaywrightFile = checkFileExtension("spec.js")
+  let isPlaywrightFile = checkFileExtension("spec.js");
 
-	if (!isPlaywrightFile) return;
+  if (!isPlaywrightFile) return;
 
-	// 2️⃣ Locate package.json
-	const workspaceFolders = vscode.workspace.workspaceFolders;
-	if (!workspaceFolders) {
-		vscode.window.showErrorMessage('No workspace opened');
-		return;
-	}
+  // 2️⃣ Locate package.json
+  const workspaceFolders = vscode.workspace.workspaceFolders;
+  if (!workspaceFolders) {
+    vscode.window.showErrorMessage("No workspace opened");
+    return;
+  }
 
-	const rootPath = workspaceFolders[0].uri.fsPath;
-	const packageJsonPath = path.join(rootPath, 'package.json');
+  const rootPath = workspaceFolders[0].uri.fsPath;
+  const packageJsonPath = path.join(rootPath, "package.json");
 
-	if (!fs.existsSync(packageJsonPath)) {
-		vscode.window.showErrorMessage('package.json not found');
-		return;
-	}
+  if (!fs.existsSync(packageJsonPath)) {
+    vscode.window.showErrorMessage("package.json not found");
+    return;
+  }
 
-	// 3️⃣ Read package.json
-	let pkg;
-	try {
-		pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-	} catch (e) {
-		vscode.window.showErrorMessage('Invalid package.json');
-		return;
-	}
+  // 3️⃣ Read package.json
+  let pkg;
+  try {
+    pkg = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+  } catch (error) {
+    console.log(`Error: ${error.message}`);
+    vscode.window.showErrorMessage("Invalid package.json");
+    return;
+  }
 
-	// 4️⃣ Check for Playwright
-	const deps = {
-		...pkg.dependencies,
-		...pkg.devDependencies
-	};
+  // 4️⃣ Check for Playwright
+  const deps = {
+    ...pkg.dependencies,
+    ...pkg.devDependencies,
+  };
 
-	const hasPlaywright =
-		deps?.['@playwright/test'] || deps?.['playwright'];
+  const hasPlaywright = deps?.["@playwright/test"] || deps?.["playwright"];
 
-	if (!hasPlaywright) {
-		vscode.window.showInformationMessage('Playwright not detected');
-		return;
-	}
-	return true
+  if (!hasPlaywright) {
+    vscode.window.showInformationMessage("Playwright not detected");
+    return;
+  }
+  return true;
 }
 function checkFileExtension(ext) {
-	const editor = vscode.window.activeTextEditor;
-	if (!editor) {
-		vscode.window.showWarningMessage('No active file');
-		return;
-	}
+  const editor = vscode.window.activeTextEditor;
+  if (!editor) {
+    vscode.window.showWarningMessage("No active file");
+    return;
+  }
 
-	const filePath = editor.document.uri.fsPath;
-	const fileName = path.basename(filePath);
+  const filePath = editor.document.uri.fsPath;
+  const fileName = path.basename(filePath);
 
-	// 1️⃣ Check spec.js
-	if (!fileName.endsWith(ext)) {
-		vscode.window.showInformationMessage(`Not a ${ext} file`);
-		return;
-	}
+  // 1️⃣ Check spec.js
+  if (!fileName.endsWith(ext)) {
+    vscode.window.showInformationMessage(`Not a ${ext} file`);
+    return;
+  }
 
-	return true
+  return true;
 }
 function readHeadlessFromEnv() {
-	const workspace = vscode.workspace.workspaceFolders?.[0];
-	if (!workspace) return null;
+  const workspace = vscode.workspace.workspaceFolders?.[0];
+  if (!workspace) return null;
 
-	const envPath = path.join(workspace.uri.fsPath, '.env');
-	if (!fs.existsSync(envPath)) return null;
+  const envPath = path.join(workspace.uri.fsPath, ".env");
+  if (!fs.existsSync(envPath)) return null;
 
-	const content = fs.readFileSync(envPath, 'utf8');
+  const content = fs.readFileSync(envPath, "utf8");
 
-	const match = content.match(/^HEADLESS\s*=\s*(true|false)/mi);
-	if (!match) return null;
+  const match = content.match(/^HEADLESS\s*=\s*(true|false)/im);
+  if (!match) return null;
 
-	return match[1].toLowerCase() === 'true';
+  return match[1].toLowerCase() === "true";
 }
 async function updateHeadlessContext() {
-	const headless = readHeadlessFromEnv();
+  const headless = readHeadlessFromEnv();
 
-	await vscode.commands.executeCommand(
-		'setContext',
-		'oneClickRun.hasHeadless',
-		headless !== null
-	);
+  await vscode.commands.executeCommand(
+    "setContext",
+    "oneClickRun.hasHeadless",
+    headless !== null
+  );
 
-	await vscode.commands.executeCommand(
-		'setContext',
-		'oneClickRun.headlessValue',
-		headless
-	);
+  await vscode.commands.executeCommand(
+    "setContext",
+    "oneClickRun.headlessValue",
+    headless
+  );
 }
 
-async function updateHeadlessValue(value) {
-	const workspace = vscode.workspace.workspaceFolders?.[0];
-	if (!workspace) return;
+async function updateHeadlessValue() {
+  const workspace = vscode.workspace.workspaceFolders?.[0];
+  if (!workspace) return;
 
-	const envPath = path.join(workspace.uri.fsPath, '.env');
-	if (!fs.existsSync(envPath)) return;
+  const envPath = path.join(workspace.uri.fsPath, ".env");
+  if (!fs.existsSync(envPath)) return;
 
-	let content = fs.readFileSync(envPath, 'utf8');
+  let content = fs.readFileSync(envPath, "utf8");
 
-	const current = readHeadlessFromEnv();
-	const next = !current;
+  const current = readHeadlessFromEnv();
+  const next = !current;
 
-	content = content.replace(
-		/^HEADLESS\s*=\s*(true|false)/mi,
-		`HEADLESS=${next}`
-	);
+  content = content.replace(
+    /^HEADLESS\s*=\s*(true|false)/im,
+    `HEADLESS=${next}`
+  );
 
-	fs.writeFileSync(envPath, content);
-	await updateHeadlessContext();
+  fs.writeFileSync(envPath, content);
+  await updateHeadlessContext();
 
-	vscode.window.setStatusBarMessage(`✅ Headless set to ${next}`, 3000);
+  vscode.window.setStatusBarMessage(`✅ Headless set to ${next}`, 3000);
 }
 
 async function updateGitBashContext() {
-	if (process.platform !== 'win32') return;
+  if (process.platform !== "win32") return;
 
-	try {
-		const { stdout } = await execAsync(
-			'tasklist /FI "IMAGENAME eq mintty.exe"'
-		);
+  try {
+    const { stdout } = await execAsync(
+      'tasklist /FI "IMAGENAME eq mintty.exe"'
+    );
 
-		const isRunning = stdout.toLowerCase().includes('mintty.exe');
+    const isRunning = stdout.toLowerCase().includes("mintty.exe");
 
-		await vscode.commands.executeCommand(
-			'setContext',
-			'oneClickRun.gitBashRunning',
-			isRunning
-		);
+    await vscode.commands.executeCommand(
+      "setContext",
+      "oneClickRun.gitBashRunning",
+      isRunning
+    );
 
-		console.log("Git Bash running:", isRunning);
-
-	} catch (err) {
-		console.error(err);
-	}
+    console.log("Git Bash running:", isRunning);
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 async function updateExecuteScriptContext() {
-	const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-	if (!workspaceFolder) {
-		await vscode.commands.executeCommand(
-			'setContext',
-			'oneClickRun.hasExecuteScript',
-			false
-		);
-		return;
-	}
+  const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+  if (!workspaceFolder) {
+    await vscode.commands.executeCommand(
+      "setContext",
+      "oneClickRun.hasExecuteScript",
+      false
+    );
+    return;
+  }
 
-	const workspaceRoot = workspaceFolder.uri.fsPath;
-	const scriptPath = path.join(workspaceRoot, 'executeScripts.sh');
+  const workspaceRoot = workspaceFolder.uri.fsPath;
+  const scriptPath = path.join(workspaceRoot, "executeScripts.sh");
 
-	const exists = fs.existsSync(scriptPath);
+  const exists = fs.existsSync(scriptPath);
 
-	await vscode.commands.executeCommand(
-		'setContext',
-		'oneClickRun.hasExecuteScript',
-		exists
-	);
+  await vscode.commands.executeCommand(
+    "setContext",
+    "oneClickRun.hasExecuteScript",
+    exists
+  );
 }
-function deactivate() { }
+
+function getTestName() {
+  const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+  const workspaceRoot = workspaceFolder.uri.fsPath;
+  const envPath = path.join(workspaceRoot, ".env");
+
+  if (!fs.existsSync(envPath)) {
+    return null;
+  }
+
+  const content = fs.readFileSync(envPath, "utf8");
+
+  const match = content.match(/^TESTNAME\s*=\s*(.*)$/m);
+
+  if (!match) {
+    return null;
+  }
+
+  return match[1].trim();
+}
+async function updateAllureContext() {
+  const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+
+  if (!workspaceFolder) {
+    await vscode.commands.executeCommand(
+      "setContext",
+      "oneClickRun.hasAllureResults",
+      false
+    );
+    return;
+  }
+
+  const workspaceRoot = workspaceFolder.uri.fsPath;
+  const allurePath = path.join(workspaceRoot, "allure-results");
+
+  const exists =
+    fs.existsSync(allurePath) && fs.statSync(allurePath).isDirectory();
+
+  await vscode.commands.executeCommand(
+    "setContext",
+    "oneClickRun.hasAllureResults",
+    exists
+  );
+}
+function deactivate() {}
 
 module.exports = {
-	activate,
-	deactivate
-}
+  activate,
+  deactivate,
+};

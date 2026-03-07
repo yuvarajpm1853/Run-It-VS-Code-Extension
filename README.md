@@ -42,7 +42,16 @@ With a right-click action, it automatically updates the .env file and triggers t
 | Shift+Alt+M | Run with Node.js (Debug) |
 
 ### Images
-![status Message](image/README/1771762259350.png)
+1. Editor Context
+![1771934179935](image/README/1771934179935.png)
+
+2. File Title Context
+![1771934239917](image/README/1771934239917.png)
+
+3. Explorer Context
+![1771934422434](image/README/1771934422434.png)
+
+
 
 ## Status Message
 ![status Message](image/README/1770092798432.png)
