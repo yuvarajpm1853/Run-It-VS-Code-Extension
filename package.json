@@ -2,7 +2,7 @@
   "name": "OneClickRun",
   "displayName": "OneClickRun",
   "description": "A productivity-focused extension for running automation scripts with terminal & debug , including Playwright & Allure.",
-  "version": "3.6.2",
+  "version": "3.8.8",
   "publisher": "yuvarajpm1853",
   "engines": {
     "vscode": "^1.100.1"
@@ -21,7 +21,11 @@
     "commands": [
       {
         "command": "copyRelativePath.Workspace",
-        "title": "Copy Relative Path (Workspace)"
+        "title": "Copy Relative Path"
+      },
+      {
+        "command": "copyDirRelativePath.Workspace",
+        "title": "Copy Relative Path (Folder)"
       },
       {
         "command": "oneClickRun.ExecuteScripts",
@@ -40,6 +44,10 @@
         "title": "Trigger executeScripts.sh"
       },
       {
+        "command": "oneClickRun.playwrightServe",
+        "title": "Playwright Serve Report"
+      },
+      {
         "command": "oneClickRun.allureServe",
         "title": "(Allure) Serve Report"
       },
@@ -50,6 +58,18 @@
       {
         "command": "oneClickRun.runWithPlaywright",
         "title": "Run with Playwright"
+      },
+      {
+        "command": "oneClickRun.runWithPlaywrightDebug",
+        "title": "Run with Playwright (Debug)"
+      },
+      {
+        "command": "oneClickRun.runWithPlaywrightHeaded",
+        "title": "Run with Playwright (Headed)"
+      },
+      {
+        "command": "oneClickRun.runWithPlaywrightDebugHeaded",
+        "title": "Run with Playwright (Headed+Debug)"
       },
       {
         "command": "oneClickRun.setHeadlessTrue",
@@ -76,84 +96,63 @@
       "explorer/context": [
         {
           "command": "copyRelativePath.Workspace",
-          "group": "0_copypath1@1"
+          "group": "0_copypath@1"
+        },
+        {
+          "command": "copyDirRelativePath.Workspace",
+          "group": "0_copypath@2"
+        },
+        {
+          "command": "oneClickRun.setHeadlessTrue",
+          "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == false",
+          "group": "0_copypath1@3"
+        },
+        {
+          "command": "oneClickRun.setHeadlessFalse",
+          "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == true",
+          "group": "0_copypath1@3"
         },
         {
           "command": "oneClickRun.ExecuteScripts",
-          "group": "0_copypath1@3",
-          "when": "oneClickRun.hasExecuteScript"
-        },
-        {
-          "command": "oneClickRun.RunExecuteScriptsDebug",
-          "group": "0_copypath3@2",
-          "when": "oneClickRun.hasExecuteScript"
-        },
-        {
-          "command": "oneClickRun.RunExecuteScripts",
-          "group": "0_copypath3@1",
-          "when": "oneClickRun.hasExecuteScript"
+          "group": "0_copypath1@4",
+          "when": "resourceExtname == '.js' && oneClickRun.hasExecuteScript"
         },
         {
           "command": "oneClickRun.ExecuteScriptsInDebug",
-          "group": "0_copypath1@4",
+          "group": "0_copypath1@5",
           "when": "resourceExtname == '.js' && oneClickRun.hasExecuteScript"
         },
         {
           "command": "oneClickRun.runWithPlaywright",
           "group": "0_copypath2@1",
-          "when": "resourceFilename =~ /spec\\.js$/ && workspace.hasPlaywright"
+          "when": "resourceFilename =~ /\\.spec\\.(js|ts)$/ && workspace.hasPlaywright"
         },
         {
-          "command": "oneClickRun.setHeadlessTrue",
-          "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == false",
-          "group": "0_copypath1@2"
-        },
-        {
-          "command": "oneClickRun.setHeadlessFalse",
-          "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == true",
-          "group": "0_copypath1@2"
+          "command": "oneClickRun.runWithPlaywrightDebug",
+          "group": "0_copypath2@1",
+          "when": "resourceFilename =~ /\\.spec\\.(js|ts)$/ && workspace.hasPlaywright"
         },
         {
           "command": "oneClickRun.runWithNode",
-          "when": "resourceExtname == '.js'",
-          "group": "0_copypath2@2"
+          "when": "resourceExtname == '.js' && !(resourceFilename =~ /\\.spec\\.(js|ts)$/)",
+          "group": "0_copypath3@1"
         },
         {
           "command": "oneClickRun.runWithNodeDebug",
-          "when": "resourceExtname == '.js'",
-          "group": "0_copypath2@3"
+          "when": "resourceExtname == '.js' && !(resourceFilename =~ /\\.spec\\.(js|ts)$/)",
+          "group": "0_copypath3@2"
         }
       ],
       "editor/title/context": [
         {
           "command": "copyRelativePath.Workspace",
-          "group": "0_copypath1@1"
+          "group": "0_copypath@1"
         },
-        {
-          "command": "oneClickRun.ExecuteScripts",
-          "group": "0_copypath1@3",
-          "when": "resourceExtname == '.js' && oneClickRun.hasExecuteScript"
+                {
+          "command": "copyDirRelativePath.Workspace",
+          "group": "0_copypath@2"
         },
-        {
-          "command": "oneClickRun.ExecuteScriptsInDebug",
-          "group": "0_copypath1@4",
-          "when": "resourceExtname == '.js' && oneClickRun.hasExecuteScript"
-        },
-        {
-          "command": "oneClickRun.RunExecuteScripts",
-          "group": "0_copypath3@1",
-          "when": "oneClickRun.hasExecuteScript"
-        },
-        {
-          "command": "oneClickRun.RunExecuteScriptsDebug",
-          "group": "0_copypath3@2",
-          "when": "oneClickRun.hasExecuteScript"
-        },
-        {
-          "command": "oneClickRun.runWithPlaywright",
-          "group": "0_copypath2@1",
-          "when": "resourceFilename =~ /spec\\.js$/ && workspace.hasPlaywright"
-        },
+
         {
           "command": "oneClickRun.setHeadlessTrue",
           "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == false",
@@ -163,58 +162,49 @@
           "command": "oneClickRun.setHeadlessFalse",
           "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == true",
           "group": "0_copypath1@2"
+        },
+        {
+          "command": "oneClickRun.ExecuteScripts",
+          "group": "0_copypath1@3",
+          "when": "(resourceExtname == '.js' || resourceFilename =~ /\\.spec\\.ts$/) && oneClickRun.hasExecuteScript"
+        },
+        {
+          "command": "oneClickRun.ExecuteScriptsInDebug",
+          "group": "0_copypath1@4",
+          "when": "(resourceExtname == '.js' || resourceFilename =~ /\\.spec\\.ts$/) && oneClickRun.hasExecuteScript"
+        },
+        {
+          "command": "oneClickRun.runWithPlaywright",
+          "group": "0_copypath2@1",
+          "when": "resourceFilename =~ /\\.spec\\.(js|ts)$/ && workspace.hasPlaywright"
+        },
+        {
+          "command": "oneClickRun.runWithPlaywrightHeaded",
+          "group": "0_copypath2@2",
+          "when": "resourceFilename =~ /\\.spec\\.(js|ts)$/ && workspace.hasPlaywright"
+        },
+        {
+          "command": "oneClickRun.runWithPlaywrightDebugHeaded",
+          "group": "0_copypath2.1@1",
+          "when": "resourceFilename =~ /\\.spec\\.(js|ts)$/ && workspace.hasPlaywright"
+        },
+        {
+          "command": "oneClickRun.runWithPlaywrightDebug",
+          "group": "0_copypath2.1@2",
+          "when": "resourceFilename =~ /\\.spec\\.(js|ts)$/ && workspace.hasPlaywright"
         },
         {
           "command": "oneClickRun.runWithNode",
-          "when": "resourceExtname == '.js'",
-          "group": "0_copypath2@2"
+          "when": "resourceExtname == '.js' && !(resourceFilename =~ /\\.spec\\.(js|ts)$/)",
+          "group": "0_copypath3@1"
         },
         {
           "command": "oneClickRun.runWithNodeDebug",
-          "when": "resourceExtname == '.js'",
-          "group": "0_copypath2@3"
+          "when": "resourceExtname == '.js' && !(resourceFilename =~ /\\.spec\\.(js|ts)$/)",
+          "group": "0_copypath3@2"
         }
       ],
       "editor/context": [
-                {
-          "command": "oneClickRun.RunExecuteScripts",
-          "group": "0_copypath3@1",
-          "when": "oneClickRun.hasExecuteScript"
-        },
-        {
-          "command": "oneClickRun.RunExecuteScriptsDebug",
-          "group": "0_copypath3@2",
-          "when": "oneClickRun.hasExecuteScript"
-        },
-        {
-          "command": "oneClickRun.ExecuteScripts",
-          "group": "0_copypath1@3",
-          "when": "resourceExtname == '.js' && oneClickRun.hasExecuteScript"
-        },
-        {
-          "command": "oneClickRun.ExecuteScriptsInDebug",
-          "group": "0_copypath1@4",
-          "when": "resourceExtname == '.js' && oneClickRun.hasExecuteScript"
-        },
-        {
-          "command": "copyRelativePath.Workspace",
-          "group": "0_copypath1@1"
-        },
-        {
-          "command": "oneClickRun.runWithPlaywright",
-          "group": "0_copypath2@1",
-          "when": "resourceFilename =~ /\\.spec\\.js$/ && workspace.hasPlaywright"
-        },
-        {
-          "command": "oneClickRun.setHeadlessTrue",
-          "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == false",
-          "group": "0_copypath1@2"
-        },
-        {
-          "command": "oneClickRun.setHeadlessFalse",
-          "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == true",
-          "group": "0_copypath1@2"
-        },
         {
           "command": "oneClickRun.allureServe",
           "group": "0_copypath@1",
@@ -226,19 +216,82 @@
           "when": "oneClickRun.hasAllureResults"
         },
         {
+          "command": "oneClickRun.playwrightServe",
+          "group": "0_copypath@3",
+          "when": "oneClickRun.hasPlaywrightResults"
+        },
+        {
           "command": "oneClickRun.closeAllGitBash",
           "group": "0_copypath@3",
           "when": "oneClickRun.gitBashRunning"
         },
         {
+          "command": "copyRelativePath.Workspace",
+          "group": "0_copypath0@0"
+        },
+        {
+          "command": "copyDirRelativePath.Workspace",
+          "group": "0_copypath0@1"
+        },
+        {
+          "command": "oneClickRun.setHeadlessTrue",
+          "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == false",
+          "group": "0_copypath1@2"
+        },
+        {
+          "command": "oneClickRun.setHeadlessFalse",
+          "when": "oneClickRun.hasHeadless && oneClickRun.headlessValue == true",
+          "group": "0_copypath1@2"
+        },
+        {
+          "command": "oneClickRun.ExecuteScripts",
+          "group": "0_copypath1@3",
+          "when": "(resourceExtname == '.js' || resourceFilename =~ /\\.spec\\.ts$/) && oneClickRun.hasExecuteScript"
+        },
+        {
+          "command": "oneClickRun.ExecuteScriptsInDebug",
+          "group": "0_copypath1@4",
+          "when": "(resourceExtname == '.js' || resourceFilename =~ /\\.spec\\.ts$/) && oneClickRun.hasExecuteScript"
+        },
+        {
+          "command": "oneClickRun.runWithPlaywright",
+          "group": "0_copypath2@1",
+          "when": "resourceFilename =~ /\\.spec\\.(js|ts)$/ && workspace.hasPlaywright"
+        },
+        {
+          "command": "oneClickRun.runWithPlaywrightDebug",
+          "group": "0_copypath2@2",
+          "when": "resourceFilename =~ /\\.spec\\.(js|ts)$/ && workspace.hasPlaywright"
+        },
+        {
+          "command": "oneClickRun.runWithPlaywrightHeaded",
+          "group": "0_copypath2.1@1",
+          "when": "resourceFilename =~ /\\.spec\\.(js|ts)$/ && workspace.hasPlaywright"
+        },
+        {
+          "command": "oneClickRun.runWithPlaywrightDebugHeaded",
+          "group": "0_copypath2.1@2",
+          "when": "resourceFilename =~ /\\.spec\\.(js|ts)$/ && workspace.hasPlaywright"
+        },
+        {
           "command": "oneClickRun.runWithNode",
-          "when": "resourceExtname == '.js'",
-          "group": "0_copypath2@2"
+          "when": "resourceExtname == '.js' && !(resourceFilename =~ /\\.spec\\.(js|ts)$/)",
+          "group": "0_copypath3@1"
         },
         {
           "command": "oneClickRun.runWithNodeDebug",
-          "when": "resourceExtname == '.js'",
-          "group": "0_copypath2@3"
+          "when": "resourceExtname == '.js' && !(resourceFilename =~ /\\.spec\\.(js|ts)$/)",
+          "group": "0_copypath3@2"
+        },
+        {
+          "command": "oneClickRun.RunExecuteScripts",
+          "group": "0_copypath4@1",
+          "when": "oneClickRun.hasExecuteScript"
+        },
+        {
+          "command": "oneClickRun.RunExecuteScriptsDebug",
+          "group": "0_copypath4@2",
+          "when": "oneClickRun.hasExecuteScript"
         }
       ]
     },
@@ -279,8 +332,13 @@
         "when": "editorTextFocus"
       },
       {
-        "command": "oneClickRun.runWithPlaywright",
+        "command": "oneClickRun.runWithPlaywrightHeaded",
         "key": "shift+alt+p",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "oneClickRun.runWithPlaywrightDebugHeaded",
+        "key": "shift+alt+o",
         "when": "editorTextFocus"
       },
       {
