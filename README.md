@@ -33,7 +33,8 @@ RunIt (OneClickRun) is a Visual Studio Code extension that streamlines running t
 
 ## Images
 <img width="967" height="749" alt="1775473382376" src="https://github.com/user-attachments/assets/b189eca2-bd3e-40b9-83a9-a53d240769eb" />
-<img width="967" height="749" alt="1771934422434" src="https://github.com/user-attachments/assets/616608e3-67f4-43c0-9cc9-32ce5f7a1eef" />
+<img width="1593" height="1041" alt="image" src="https://github.com/user-attachments/assets/26e684b6-2685-4488-b77e-94c5ebb242aa" />
+
 
 ## Status Message
 
