@@ -32,8 +32,9 @@ RunIt (OneClickRun) is a Visual Studio Code extension that streamlines running t
 | Shift + Alt + W | Close all Git Bash                   |
 
 ## Images
-![status Message](image/README/all.png)
-![img](image/all.png)
+<img width="967" height="749" alt="1775473382376" src="https://github.com/user-attachments/assets/b189eca2-bd3e-40b9-83a9-a53d240769eb" />
+<img width="1358" height="764" alt="1771934422434" src="https://github.com/user-attachments/assets/616608e3-67f4-43c0-9cc9-32ce5f7a1eef" />
+
 ## Status Message
 
 ![status Message](image/README/1770092798432.png)
